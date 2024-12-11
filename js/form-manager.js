@@ -30,9 +30,88 @@ class FormManager {
 
     static updateChannelDependencies() {
         const isManual = document.getElementById('manualChannelToggle').checked;
-        const channel = isManual ? 
-            document.getElementById('channelInput').value :
-            document.getElementById('channelDropdown').value;
+        const channelTypeSelect = document.getElementById('channelType');
+        const mediaObjectiveSelect = document.getElementById('mediaObjective');
+        const buyTypeSelect = document.getElementById('buyType');
+        
+        channelTypeSelect.innerHTML = '<option value="">Select...</option>';
+        
+        if (isManual) {
+            // Add manual channel types
+            CONFIG.manualChannelTypes.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = type;
+                channelTypeSelect.appendChild(option);
+            });
+        } else {
+            const channel = document.getElementById('channelDropdown').value;
+            if (channel && CONFIG.channelDependencies[channel]) {
+                CONFIG.channelDependencies[channel].channelTypes.forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type;
+                    option.textContent = type;
+                    channelTypeSelect.appendChild(option);
+                });
+            }
+        }
+
+        // Update media objectives (same for both manual and dropdown)
+        mediaObjectiveSelect.innerHTML = '<option value="">Select...</option>';
+        ['Attract', 'Engage', 'Convert', 'Retain'].forEach(objective => {
+            const option = document.createElement('option');
+            option.value = objective;
+            option.textContent = objective;
+            mediaObjectiveSelect.appendChild(option);
+        });
+
+        // Clear and update buy types
+        this.updateBuyTypes();
+    }
+
+    static updateBuyTypes() {
+        const isManual = document.getElementById('manualChannelToggle').checked;
+        const channelType = document.getElementById('channelType').value;
+        const buyTypeSelect = document.getElementById('buyType');
+        
+        buyTypeSelect.innerHTML = '<option value="">Select...</option>';
+        
+        if (isManual && channelType) {
+            const buyTypes = CONFIG.manualBuyTypes[channelType] || [];
+            buyTypes.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = type;
+                buyTypeSelect.appendChild(option);
+            });
+        } else if (!isManual) {
+            const channel = document.getElementById('channelDropdown').value;
+            if (channel && CONFIG.channelDependencies[channel]) {
+                CONFIG.channelDependencies[channel].buyTypes.forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type;
+                    option.textContent = type;
+                    buyTypeSelect.appendChild(option);
+                });
+            }
+        }
+    }
+
+    static updateQuarterMonths() {
+        const quarter = document.getElementById('quarter').value;
+        const monthSelect = document.getElementById('month');
+        
+        monthSelect.innerHTML = '<option value="">Select...</option>';
+        
+        if (quarter && CONFIG.quarterMonths[quarter]) {
+            CONFIG.quarterMonths[quarter].forEach(month => {
+                const option = document.createElement('option');
+                option.value = month;
+                option.textContent = month;
+                monthSelect.appendChild(option);
+            });
+        }
+    }
         const channelTypeSelect = document.getElementById('channelType');
         const mediaObjectiveSelect = document.getElementById('mediaObjective');
         const buyTypeSelect = document.getElementById('buyType');
