@@ -170,9 +170,9 @@ class FormManager {
     static getFormData() {
         return {
             baseUrl: document.getElementById('baseUrl').value,
-            channel: document.getElementById('channel').value === 'other' ? 
-                    document.getElementById('otherChannel').value : 
-                    document.getElementById('channel').value,
+            channel: document.getElementById('manualChannelToggle').checked ?
+                    document.getElementById('channelInput').value :
+                    document.getElementById('channelDropdown').value,
             campaignName: document.getElementById('campaignName').value,
             adName: document.getElementById('adName').value,
             adSet: document.getElementById('adSet').value,
