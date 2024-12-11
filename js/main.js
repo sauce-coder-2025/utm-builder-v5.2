@@ -1,72 +1,95 @@
+console.log('Loading main.js...');
+console.log('CONFIG object available:', CONFIG);
+
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded');
+    
     // Campaign Organization dependencies
-    document.getElementById('market').addEventListener('change', () => {
-        FormManager.updateBrandOptions();
-    });
-    
-    document.getElementById('productCategory').addEventListener('change', () => {
-        FormManager.updateSubCategories();
-    });
-
-    // Campaign Timing dependencies
-    document.getElementById('quarter').addEventListener('change', () => {
-        FormManager.updateQuarterMonths();
-    });
-
-    // Campaign Details dependencies
-    document.getElementById('channelDropdown').addEventListener('change', () => {
-        FormManager.updateChannelDependencies();
-    });
-    
-    document.getElementById('channelInput').addEventListener('input', () => {
-        FormManager.updateChannelDependencies();
-    });
-
-    document.getElementById('channelType').addEventListener('change', () => {
-        FormManager.updateBuyTypes();
-    });
-
-    // Manual toggles
-    document.getElementById('manualChannelToggle').addEventListener('change', () => {
-        FormManager.toggleManualChannel();
-    });
-
-    document.getElementById('manualUtmToggle').addEventListener('change', () => {
-        FormManager.toggleManualUtm();
-    });
-
-    // UTM field updates
-    document.getElementById('channelDropdown').addEventListener('change', FormManager.updateUTMFields);
-    document.getElementById('channelInput').addEventListener('input', FormManager.updateUTMFields);
-    document.getElementById('channelType').addEventListener('change', FormManager.updateUTMFields);
-    document.getElementById('campaignName').addEventListener('input', FormManager.updateUTMFields);
-    document.getElementById('adName').addEventListener('input', FormManager.updateUTMFields);
-
-    // Add input formatters for manual UTM fields
-    document.querySelectorAll('#utmSource, #utmMedium, #utmCampaign, #utmContent, #utmTerm')
-        .forEach(input => {
-            input.addEventListener('input', function() {
-                if (document.getElementById('manualUtmToggle').checked) {
-                    this.value = Utils.formatUtmValue(this.value);
-                }
-            });
+    const marketSelect = document.getElementById('market');
+    if (marketSelect) {
+        console.log('Market select found');
+        marketSelect.addEventListener('change', () => {
+            console.log('Market changed to:', marketSelect.value);
+            FormManager.updateBrandOptions();
         });
-
-    // Auto button handlers
-    document.querySelectorAll('.auto-button').forEach(button => {
-        button.addEventListener('click', function(e) {
-            const input = this.closest('.input-group-auto').querySelector('input');
-            if (input.id === 'campaignName') {
-                FormManager.generateCampaignName();
-            } else if (input.id === 'adSet') {
-                FormManager.generateAdSetName();
-            }
+    } else {
+        console.error('Market select not found');
+    }
+    
+    // Product Category dependency
+    const productCategory = document.getElementById('productCategory');
+    if (productCategory) {
+        productCategory.addEventListener('change', () => {
+            console.log('Product category changed to:', productCategory.value);
+            FormManager.updateSubCategories();
         });
-    });
+    }
 
-    // Initialize dropdowns
+    // Quarter dependency
+    const quarterSelect = document.getElementById('quarter');
+    if (quarterSelect) {
+        quarterSelect.addEventListener('change', () => {
+            console.log('Quarter changed to:', quarterSelect.value);
+            FormManager.updateQuarterMonths();
+        });
+    }
+
+    // Source/Medium dependencies
+    const channelDropdown = document.getElementById('channelDropdown');
+    if (channelDropdown) {
+        channelDropdown.addEventListener('change', () => {
+            console.log('Channel changed to:', channelDropdown.value);
+            FormManager.updateChannelDependencies();
+        });
+    }
+
+    const channelType = document.getElementById('channelType');
+    if (channelType) {
+        channelType.addEventListener('change', () => {
+            console.log('Channel type changed to:', channelType.value);
+            FormManager.updateBuyTypes();
+        });
+    }
+
+    // Manual toggle handlers
+    const manualChannelToggle = document.getElementById('manualChannelToggle');
+    if (manualChannelToggle) {
+        manualChannelToggle.addEventListener('change', () => {
+            console.log('Manual channel toggle changed to:', manualChannelToggle.checked);
+            FormManager.toggleManualChannel();
+        });
+    }
+
+    const manualUtmToggle = document.getElementById('manualUtmToggle');
+    if (manualUtmToggle) {
+        manualUtmToggle.addEventListener('change', () => {
+            console.log('Manual UTM toggle changed to:', manualUtmToggle.checked);
+            FormManager.toggleManualUtm();
+        });
+    }
+
+    // Auto-name generation buttons
+    const campaignNameBtn = document.querySelector('button[onclick="utmManager.generateUTM()"]');
+    if (campaignNameBtn) {
+        campaignNameBtn.addEventListener('click', () => utmManager.generateUTM());
+    }
+
+    const saveUtmBtn = document.querySelector('button[onclick="utmManager.saveUTM()"]');
+    if (saveUtmBtn) {
+        saveUtmBtn.addEventListener('click', () => utmManager.saveUTM());
+    }
+
+    const completeSessionBtn = document.querySelector('button[onclick="utmManager.completeSession()"]');
+    if (completeSessionBtn) {
+        completeSessionBtn.addEventListener('click', () => utmManager.completeSession());
+    }
+
+    // Initialize all dropdowns
+    console.log('Initializing dropdowns...');
     FormManager.updateBrandOptions();
     FormManager.updateSubCategories();
     FormManager.updateQuarterMonths();
     FormManager.updateChannelDependencies();
+
+    console.log('Initialization complete');
 });
