@@ -1,4 +1,7 @@
 class FormManager {
+    static logDebug(method, ...args) {
+        console.log(`FormManager.${method}:`, ...args);
+    }
     // Product Category -> Sub Category dependency
     static updateSubCategories() {
         const category = document.getElementById('productCategory').value;
