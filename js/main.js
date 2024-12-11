@@ -2,6 +2,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add market change listener
     document.getElementById('market').addEventListener('change', FormManager.updateBrandOptions);
     
+    // Add quarter change listener
+    document.getElementById('quarter').addEventListener('change', () => {
+        FormManager.updateQuarterMonths();
+    });
+
+    // Add channel type change listener
+    document.getElementById('channelType').addEventListener('change', () => {
+        FormManager.updateBuyTypes();
+    });
+
     // Add channel change listeners
     document.getElementById('channelDropdown').addEventListener('change', () => {
         FormManager.updateChannelDependencies();
