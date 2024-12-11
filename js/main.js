@@ -2,10 +2,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add market change listener
     document.getElementById('market').addEventListener('change', FormManager.updateBrandOptions);
     
-    // Add channel change listener
-    document.getElementById('channel').addEventListener('change', () => {
+    // Add channel change listeners
+    document.getElementById('channelDropdown').addEventListener('change', () => {
         FormManager.updateChannelDependencies();
-        FormManager.toggleOtherChannel();
+    });
+    
+    document.getElementById('channelInput').addEventListener('input', () => {
+        FormManager.updateChannelDependencies();
+    });
+
+    // Add manual channel toggle listener
+    document.getElementById('manualChannelToggle').addEventListener('change', () => {
+        FormManager.toggleManualChannel();
     });
 
     // Add product category change listener
