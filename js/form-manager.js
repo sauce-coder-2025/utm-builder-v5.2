@@ -25,6 +25,8 @@ class FormManager {
         const market = document.getElementById('market').value;
         const brandSelect = document.getElementById('brand');
         
+        this.logDebug('updateBrandOptions', { market, availableBrands: CONFIG.marketBrands[market] });
+        
         brandSelect.innerHTML = '<option value="">Select...</option>';
         if (market && CONFIG.marketBrands[market]) {
             CONFIG.marketBrands[market].forEach(brand => {
