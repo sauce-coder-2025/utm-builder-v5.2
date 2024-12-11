@@ -22,7 +22,15 @@ const CONFIG = {
         'GBL': ['F&P', 'Haier', 'Haier Home', 'Home Solutions', 'DCS']
     },
 
-    // Channel dependencies
+    // Quarter-Month dependencies
+    quarterMonths: {
+        'Q1': ['January', 'February', 'March'],
+        'Q2': ['April', 'May', 'June'],
+        'Q3': ['July', 'August', 'September'],
+        'Q4': ['October', 'November', 'December']
+    },
+
+    // Source (Channel) dependencies
     channelDependencies: {
         'Meta': {
             channelTypes: ['Paid Social', 'Social'],
@@ -48,10 +56,27 @@ const CONFIG = {
             channelTypes: ['Display', 'Video'],
             mediaObjectives: ['Attract', 'Engage', 'Convert', 'Retain'],
             buyTypes: ['Reach', 'Traffic', 'Conversion', 'Engagement']
+        },
+        'Offline': {
+            channelTypes: ['Offline', 'Partnership'],
+            mediaObjectives: ['Attract', 'Engage', 'Convert', 'Retain'],
+            buyTypes: ['QR Code', 'Email', 'Website']
+        },
+        'Partnership': {
+            channelTypes: ['Email', 'Website', 'Social', 'Paid Social', 'Offline'],
+            mediaObjectives: ['Attract', 'Engage', 'Convert', 'Retain'],
+            buyTypes: ['Email', 'Website', 'Social', 'Paid Social', 'Offline']
         }
     },
 
-    // Abbreviation mappings
+    // Manual channel types and buy types
+    manualChannelTypes: ['Offline', 'Partnership'],
+    manualBuyTypes: {
+        'Offline': ['QR Code'],
+        'Partnership': ['Email', 'Website', 'Social', 'Paid Social', 'Offline']
+    },
+
+    // Abbreviations for name generation
     abbreviations: {
         markets: {
             'AU': {
@@ -150,37 +175,6 @@ const CONFIG = {
             'Accessories': 'ACC',
             'Water Filters': 'FILT',
             'Cleaning': 'CLEAN'
-        }
-    },
-        markets: {
-            'AU': {
-                'F&P': 'FPAU',
-                'Haier': 'HAIAU',
-                'Haier Home': 'HHAU',
-                'Home Solutions': 'HSAU',
-                'DCS': 'DCSAU'
-            },
-            // Add other market abbreviations...
-        },
-        mediaObjective: {
-            'Attract': 'ATT',
-            'Engage': 'ENG',
-            'Convert': 'CON',
-            'Retain': 'RET'
-        },
-        month: {
-            'January': 'JAN',
-            'February': 'FEB',
-            'March': 'MAR',
-            'April': 'APR',
-            'May': 'MAY',
-            'June': 'JUN',
-            'July': 'JUL',
-            'August': 'AUG',
-            'September': 'SEP',
-            'October': 'OCT',
-            'November': 'NOV',
-            'December': 'DEC'
         }
     }
 };
