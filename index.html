@@ -112,9 +112,15 @@
                 <div class="form-section">
                     <h3>Campaign Details</h3>
                     <div class="row g-3">
+                        <div class="col-12 mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="manualChannelToggle">
+                                <label class="form-check-label" for="manualChannelToggle">Enable manual channel input</label>
+                            </div>
+                        </div>
                         <div class="col-md-6">
                             <label for="channel" class="form-label">Channel</label>
-                            <select class="form-select" id="channel" required>
+                            <select class="form-select" id="channelDropdown">
                                 <option value="">Select...</option>
                                 <option value="Meta">Meta</option>
                                 <option value="Tiktok">Tiktok</option>
@@ -124,12 +130,8 @@
                                 <option value="Offline">Offline</option>
                                 <option value="Partnership">Partnership</option>
                                 <option value="Publisher">Publisher</option>
-                                <option value="other">Other</option>
                             </select>
-                        </div>
-                        <div class="col-md-6" id="otherChannelDiv" style="display: none;">
-                            <label for="otherChannel" class="form-label">Other Channel</label>
-                            <input type="text" class="form-control" id="otherChannel">
+                            <input type="text" class="form-control" id="channelInput" style="display: none;">
                         </div>
                         <div class="col-md-6">
                             <label for="channelType" class="form-label">Channel Type</label>
