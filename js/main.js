@@ -68,20 +68,51 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Auto-name generation buttons
-    const campaignNameBtn = document.querySelector('button[onclick="utmManager.generateUTM()"]');
-    if (campaignNameBtn) {
-        campaignNameBtn.addEventListener('click', () => utmManager.generateUTM());
+    // Add Auto buttons to campaign structure section
+    // Campaign Name Auto button
+    const campaignNameInput = document.getElementById('campaignName');
+    const campaignNameWrapper = document.createElement('div');
+    campaignNameWrapper.className = 'input-group-auto';
+    
+    if (campaignNameInput) {
+        // Move the existing input
+        const parent = campaignNameInput.parentNode;
+        parent.removeChild(campaignNameInput);
+        
+        // Create and add the Auto button
+        const autoButton = document.createElement('button');
+        autoButton.type = 'button';
+        autoButton.className = 'auto-button btn btn-sm';
+        autoButton.textContent = 'Auto';
+        autoButton.onclick = () => FormManager.generateCampaignName();
+        
+        // Add button and input to wrapper
+        campaignNameWrapper.appendChild(autoButton);
+        campaignNameWrapper.appendChild(campaignNameInput);
+        parent.appendChild(campaignNameWrapper);
     }
 
-    const saveUtmBtn = document.querySelector('button[onclick="utmManager.saveUTM()"]');
-    if (saveUtmBtn) {
-        saveUtmBtn.addEventListener('click', () => utmManager.saveUTM());
-    }
-
-    const completeSessionBtn = document.querySelector('button[onclick="utmManager.completeSession()"]');
-    if (completeSessionBtn) {
-        completeSessionBtn.addEventListener('click', () => utmManager.completeSession());
+    // Ad Set Auto button
+    const adSetInput = document.getElementById('adSet');
+    const adSetWrapper = document.createElement('div');
+    adSetWrapper.className = 'input-group-auto';
+    
+    if (adSetInput) {
+        // Move the existing input
+        const parent = adSetInput.parentNode;
+        parent.removeChild(adSetInput);
+        
+        // Create and add the Auto button
+        const autoButton = document.createElement('button');
+        autoButton.type = 'button';
+        autoButton.className = 'auto-button btn btn-sm';
+        autoButton.textContent = 'Auto';
+        autoButton.onclick = () => FormManager.generateAdSetName();
+        
+        // Add button and input to wrapper
+        adSetWrapper.appendChild(autoButton);
+        adSetWrapper.appendChild(adSetInput);
+        parent.appendChild(adSetWrapper);
     }
 
     // Initialize all dropdowns
