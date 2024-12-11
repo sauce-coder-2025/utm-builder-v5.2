@@ -1,4 +1,5 @@
 class FormManager {
+    // Product Category -> Sub Category dependency
     static updateSubCategories() {
         const category = document.getElementById('productCategory').value;
         const subCategorySelect = document.getElementById('subCategory');
@@ -11,8 +12,12 @@ class FormManager {
             optionElement.textContent = option;
             subCategorySelect.appendChild(optionElement);
         });
+
+        // Clear any dependent fields
+        this.updateUTMFields();
     }
 
+    // Market -> Brand dependency
     static updateBrandOptions() {
         const market = document.getElementById('market').value;
         const brandSelect = document.getElementById('brand');
@@ -26,14 +31,40 @@ class FormManager {
                 brandSelect.appendChild(option);
             });
         }
+
+        // Clear dependent fields
+        document.getElementById('campaignName').value = '';
+        this.updateUTMFields();
     }
 
+    // Quarter -> Month dependency
+    static updateQuarterMonths() {
+        const quarter = document.getElementById('quarter').value;
+        const monthSelect = document.getElementById('month');
+        
+        monthSelect.innerHTML = '<option value="">Select...</option>';
+        if (quarter && CONFIG.quarterMonths[quarter]) {
+            CONFIG.quarterMonths[quarter].forEach(month => {
+                const option = document.createElement('option');
+                option.value = month;
+                option.textContent = month;
+                monthSelect.appendChild(option);
+            });
+        }
+
+        // Clear dependent fields
+        document.getElementById('campaignName').value = '';
+        this.updateUTMFields();
+    }
+
+    // Source/Channel -> Medium dependency and others
     static updateChannelDependencies() {
         const isManual = document.getElementById('manualChannelToggle').checked;
         const channelTypeSelect = document.getElementById('channelType');
         const mediaObjectiveSelect = document.getElementById('mediaObjective');
         const buyTypeSelect = document.getElementById('buyType');
         
+        // Update Medium (Channel Type) options
         channelTypeSelect.innerHTML = '<option value="">Select...</option>';
         
         if (isManual) {
@@ -56,7 +87,7 @@ class FormManager {
             }
         }
 
-        // Update media objectives (same for both manual and dropdown)
+        // Update media objectives
         mediaObjectiveSelect.innerHTML = '<option value="">Select...</option>';
         ['Attract', 'Engage', 'Convert', 'Retain'].forEach(objective => {
             const option = document.createElement('option');
@@ -66,9 +97,12 @@ class FormManager {
         });
 
         // Clear and update buy types
+        buyTypeSelect.innerHTML = '<option value="">Select...</option>';
         this.updateBuyTypes();
+        this.updateUTMFields();
     }
 
+    // Medium (Channel Type) -> Buy Type dependency
     static updateBuyTypes() {
         const isManual = document.getElementById('manualChannelToggle').checked;
         const channelType = document.getElementById('channelType').value;
@@ -95,102 +129,7 @@ class FormManager {
                 });
             }
         }
-    }
-
-    static updateQuarterMonths() {
-        const quarter = document.getElementById('quarter').value;
-        const monthSelect = document.getElementById('month');
-        
-        monthSelect.innerHTML = '<option value="">Select...</option>';
-        
-        if (quarter && CONFIG.quarterMonths[quarter]) {
-            CONFIG.quarterMonths[quarter].forEach(month => {
-                const option = document.createElement('option');
-                option.value = month;
-                option.textContent = month;
-                monthSelect.appendChild(option);
-            });
-        }
-    }
-        const channelTypeSelect = document.getElementById('channelType');
-        const mediaObjectiveSelect = document.getElementById('mediaObjective');
-        const buyTypeSelect = document.getElementById('buyType');
-        
-        // Update channel types
-        channelTypeSelect.innerHTML = '<option value="">Select...</option>';
-        if (channel && CONFIG.channelDependencies[channel]) {
-            CONFIG.channelDependencies[channel].channelTypes.forEach(type => {
-                const option = document.createElement('option');
-                option.value = type;
-                option.textContent = type;
-                channelTypeSelect.appendChild(option);
-            });
-        }
-
-        // Update media objectives
-        mediaObjectiveSelect.innerHTML = '<option value="">Select...</option>';
-        if (channel && CONFIG.channelDependencies[channel]) {
-            CONFIG.channelDependencies[channel].mediaObjectives.forEach(objective => {
-                const option = document.createElement('option');
-                option.value = objective;
-                option.textContent = objective;
-                mediaObjectiveSelect.appendChild(option);
-            });
-        }
-
-        // Update buy types
-        buyTypeSelect.innerHTML = '<option value="">Select...</option>';
-        if (channel && CONFIG.channelDependencies[channel]) {
-            CONFIG.channelDependencies[channel].buyTypes.forEach(type => {
-                const option = document.createElement('option');
-                option.value = type;
-                option.textContent = type;
-                buyTypeSelect.appendChild(option);
-            });
-        }
-    }
-
-    static generateCampaignName() {
-        const market = document.getElementById('market').value;
-        const brand = document.getElementById('brand').value;
-        const mediaObjective = document.getElementById('mediaObjective').value;
-        const financialYear = document.getElementById('financialYear').value;
-        const quarter = document.getElementById('quarter').value;
-        const month = document.getElementById('month').value;
-
-        if (!market || !brand || !mediaObjective || !financialYear || !quarter || !month) {
-            Utils.showNotification('Please fill in all required fields first');
-            return;
-        }
-
-        const marketBrandCode = CONFIG.abbreviations.markets[market][brand];
-        const objectiveCode = CONFIG.abbreviations.mediaObjective[mediaObjective];
-        const monthCode = CONFIG.abbreviations.month[month];
-
-        const campaignName = `${marketBrandCode}_${objectiveCode}_${financialYear}_${quarter}_${monthCode}`;
-        document.getElementById('campaignName').value = campaignName;
-        
         this.updateUTMFields();
-    }
-
-    static generateAdSetName() {
-        const mediaObjective = document.getElementById('mediaObjective').value;
-        const buyType = document.getElementById('buyType').value;
-        const category = document.getElementById('productCategory').value;
-        const subCategory = document.getElementById('subCategory').value;
-
-        if (!mediaObjective || !buyType) {
-            Utils.showNotification('Please select Media Objective and Buy Type first');
-            return;
-        }
-
-        const objectiveCode = CONFIG.abbreviations.mediaObjective[mediaObjective];
-        const buyTypeCode = CONFIG.abbreviations.buyType[buyType];
-        const categoryCode = category ? CONFIG.abbreviations.category[category] || '' : '';
-        const subCategoryCode = subCategory ? '_' + (CONFIG.abbreviations.subCategory[subCategory] || '') : '';
-        
-        const adSetName = `${objectiveCode}_${buyTypeCode}${categoryCode ? '_' + categoryCode : ''}${subCategoryCode}`;
-        document.getElementById('adSet').value = adSetName;
     }
 
     static toggleManualChannel() {
@@ -232,18 +171,18 @@ class FormManager {
         const isManual = document.getElementById('manualUtmToggle').checked;
         if (isManual) return;
 
-        const channel = document.getElementById('channel');
-        const otherChannel = document.getElementById('otherChannel');
-        const channelType = document.getElementById('channelType');
-        const campaignName = document.getElementById('campaignName');
-        const adName = document.getElementById('adName');
-        
-        const channelValue = channel.value === 'other' ? otherChannel.value : channel.value;
+        const isManualChannel = document.getElementById('manualChannelToggle').checked;
+        const channelValue = isManualChannel ? 
+            document.getElementById('channelInput').value : 
+            document.getElementById('channelDropdown').value;
+        const channelType = document.getElementById('channelType').value;
+        const campaignName = document.getElementById('campaignName').value;
+        const adName = document.getElementById('adName').value;
         
         document.getElementById('utmSource').value = Utils.formatUtmValue(channelValue);
-        document.getElementById('utmMedium').value = Utils.formatUtmValue(channelType.value);
-        document.getElementById('utmCampaign').value = Utils.formatUtmValue(campaignName.value);
-        document.getElementById('utmContent').value = Utils.formatUtmValue(adName.value);
+        document.getElementById('utmMedium').value = Utils.formatUtmValue(channelType);
+        document.getElementById('utmCampaign').value = Utils.formatUtmValue(campaignName);
+        document.getElementById('utmContent').value = Utils.formatUtmValue(adName);
     }
 
     static getFormData() {
