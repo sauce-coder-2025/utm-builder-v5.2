@@ -2,82 +2,77 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Loading main.js...');
     
     if (!window.FormManager) {
-        console.error('FormManager not loaded!');
+        console.error('FormManager not loaded');
         return;
     }
 
-    // Market change handler
-    document.getElementById('market')?.addEventListener('change', () => {
-        FormManager.updateBrandOptions();
-        FormManager.generateCampaignName();
+    if (!window.CONFIG) {
+        console.error('CONFIG not loaded');
+        return;
+    }
+
+    // Campaign name generation triggers
+    const campaignFields = ['market', 'brand', 'financialYear', 'quarter', 'month', 'mediaObjective'];
+    campaignFields.forEach(fieldId => {
+        const element = document.getElementById(fieldId);
+        if (element) {
+            element.addEventListener('change', () => {
+                console.log(`${fieldId} changed`);
+                if (fieldId === 'market') FormManager.updateBrandOptions();
+                if (fieldId === 'quarter') FormManager.updateQuarterMonths();
+                FormManager.generateCampaignName();
+            });
+        } else {
+            console.error(`Element not found: ${fieldId}`);
+        }
     });
 
-    // Brand change handler
-    document.getElementById('brand')?.addEventListener('change', () => {
-        FormManager.generateCampaignName();
+    // Ad set name generation triggers
+    const adSetFields = ['productCategory', 'subCategory', 'buyType'];
+    adSetFields.forEach(fieldId => {
+        const element = document.getElementById(fieldId);
+        if (element) {
+            element.addEventListener('change', () => {
+                console.log(`${fieldId} changed`);
+                if (fieldId === 'productCategory') FormManager.updateSubCategories();
+                FormManager.generateAdSetName();
+            });
+        } else {
+            console.error(`Element not found: ${fieldId}`);
+        }
     });
 
-    // Media Objective change handler
-    document.getElementById('mediaObjective')?.addEventListener('change', () => {
-        FormManager.generateCampaignName();
-        FormManager.generateAdSetName();
+    // UTM field update triggers
+    const utmTriggerFields = ['channelDropdown', 'channelInput', 'channelType', 'campaignName', 'adName'];
+    utmTriggerFields.forEach(fieldId => {
+        const element = document.getElementById(fieldId);
+        if (element) {
+            const eventType = ['channelInput', 'campaignName', 'adName'].includes(fieldId) ? 'input' : 'change';
+            element.addEventListener(eventType, () => {
+                console.log(`${fieldId} ${eventType}`);
+                if (fieldId === 'channelDropdown') FormManager.updateChannelDependencies();
+                FormManager.updateUTMFields();
+            });
+        } else {
+            console.error(`Element not found: ${fieldId}`);
+        }
     });
 
-    // Campaign Timing handlers
-    document.getElementById('financialYear')?.addEventListener('change', () => {
-        FormManager.generateCampaignName();
+    // Manual toggle handlers
+    document.getElementById('manualChannelToggle')?.addEventListener('change', () => {
+        console.log('Manual channel toggle changed');
+        FormManager.toggleManualChannel();
     });
 
-    document.getElementById('quarter')?.addEventListener('change', () => {
-        FormManager.updateQuarterMonths();
-        FormManager.generateCampaignName();
+    document.getElementById('manualUtmToggle')?.addEventListener('change', () => {
+        console.log('Manual UTM toggle changed');
+        FormManager.toggleManualUtm();
     });
 
-    document.getElementById('month')?.addEventListener('change', () => {
-        FormManager.generateCampaignName();
-    });
-
-    // Product Category handlers
-    document.getElementById('productCategory')?.addEventListener('change', () => {
-        FormManager.updateSubCategories();
-        FormManager.generateAdSetName();
-    });
-
-    document.getElementById('subCategory')?.addEventListener('change', () => {
-        FormManager.generateAdSetName();
-    });
-
-    // Buy Type handler
-    document.getElementById('buyType')?.addEventListener('change', () => {
-        FormManager.generateAdSetName();
-    });
-
-    // For UTM parameters
-    document.getElementById('channelDropdown')?.addEventListener('change', () => {
-        FormManager.updateChannelDependencies();
-        FormManager.updateUTMFields();
-    });
-
-    document.getElementById('channelInput')?.addEventListener('input', () => {
-        FormManager.updateUTMFields();
-    });
-
-    document.getElementById('channelType')?.addEventListener('change', () => {
-        FormManager.updateUTMFields();
-    });
-
-    document.getElementById('campaignName')?.addEventListener('input', () => {
-        FormManager.updateUTMFields();
-    });
-
-    document.getElementById('adName')?.addEventListener('input', () => {
-        FormManager.updateUTMFields();
-    });
-
-    // Initialize dropdowns
-    console.log('Initializing dropdowns...');
+    // Initialize form state
+    console.log('Initializing form state...');
     FormManager.updateBrandOptions();
     FormManager.updateSubCategories();
     FormManager.updateQuarterMonths();
-    FormManager.updateChannelDependencies();
+    FormManager.updateUTMFields();
 });
