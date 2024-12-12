@@ -1,10 +1,11 @@
 class FormManager {
     static initialize() {
-        this.attachEventListeners();
+        console.log('Initializing FormManager');
         this.initializeDropdowns();
     }
 
     static initializeDropdowns() {
+        console.log('Initializing all dropdowns');
         this.updateBrandOptions();
         this.updateSubCategories();
         this.updateQuarterMonths();
@@ -12,8 +13,14 @@ class FormManager {
     }
 
     static updateBrandOptions() {
+        console.log('Updating brand options');
         const market = document.getElementById('market').value;
         const brandSelect = document.getElementById('brand');
+        
+        if (!brandSelect) {
+            console.error('Brand select element not found');
+            return;
+        }
         
         brandSelect.innerHTML = '<option value="">Select...</option>';
         if (market && CONFIG.marketBrands[market]) {
@@ -27,8 +34,14 @@ class FormManager {
     }
 
     static updateSubCategories() {
+        console.log('Updating subcategories');
         const category = document.getElementById('productCategory').value;
         const subCategorySelect = document.getElementById('subCategory');
+        
+        if (!subCategorySelect) {
+            console.error('Subcategory select element not found');
+            return;
+        }
         
         subCategorySelect.innerHTML = '<option value="">Select...</option>';
         if (category && CONFIG.subCategories[category]) {
@@ -42,8 +55,14 @@ class FormManager {
     }
 
     static updateQuarterMonths() {
+        console.log('Updating quarter months');
         const quarter = document.getElementById('quarter').value;
         const monthSelect = document.getElementById('month');
+        
+        if (!monthSelect) {
+            console.error('Month select element not found');
+            return;
+        }
         
         monthSelect.innerHTML = '<option value="">Select...</option>';
         if (quarter && CONFIG.quarterMonths[quarter]) {
@@ -57,11 +76,17 @@ class FormManager {
     }
 
     static updateChannelDependencies() {
+        console.log('Updating channel dependencies');
         const channel = document.getElementById('channelDropdown').value;
         const channelTypeSelect = document.getElementById('channelType');
         const mediaObjectiveSelect = document.getElementById('mediaObjective');
         const buyTypeSelect = document.getElementById('buyType');
         
+        if (!channelTypeSelect || !mediaObjectiveSelect || !buyTypeSelect) {
+            console.error('One or more dependent select elements not found');
+            return;
+        }
+
         // Reset all dependent dropdowns
         channelTypeSelect.innerHTML = '<option value="">Select...</option>';
         mediaObjectiveSelect.innerHTML = '<option value="">Select...</option>';
@@ -99,6 +124,7 @@ class FormManager {
     }
 
     static generateCampaignName() {
+        console.log('Generating campaign name');
         const market = document.getElementById('market').value;
         const brand = document.getElementById('brand').value;
         const financialYear = document.getElementById('financialYear').value;
@@ -121,6 +147,7 @@ class FormManager {
     }
 
     static generateAdSetName() {
+        console.log('Generating ad set name');
         const productCategory = document.getElementById('productCategory').value;
         const subCategory = document.getElementById('subCategory').value;
         const buyType = document.getElementById('buyType').value;
@@ -139,6 +166,7 @@ class FormManager {
     }
 
     static updateUTMFields() {
+        console.log('Updating UTM fields');
         if (document.getElementById('manualUtmToggle').checked) return;
 
         const channel = document.getElementById('channelDropdown').value;
@@ -154,6 +182,7 @@ class FormManager {
     }
 
     static toggleManualChannel() {
+        console.log('Toggling manual channel input');
         const isManual = document.getElementById('manualChannelToggle').checked;
         const dropdownDiv = document.getElementById('channelDropdown');
         const inputDiv = document.getElementById('channelInput');
@@ -171,6 +200,7 @@ class FormManager {
     }
 
     static toggleManualUtm() {
+        console.log('Toggling manual UTM input');
         const isManual = document.getElementById('manualUtmToggle').checked;
         const utmFields = ['utmSource', 'utmMedium', 'utmCampaign', 'utmContent'];
         
@@ -206,7 +236,7 @@ class FormManager {
     }
 }
 
-// Initialize when the document is ready
-document.addEventListener('DOMContentLoaded', () => {
-    FormManager.initialize();
-});
+// Initialize FormManager on window
+if (typeof window !== 'undefined') {
+    window.FormManager = FormManager;
+}
