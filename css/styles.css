@@ -149,8 +149,7 @@ h1 {
 }
 
 .utm-log .table td {
-    white-space: normal;
-    word-wrap: break-word;
+    white-space: pre-wrap;
 }
 
 /* Generated UTM Section */
