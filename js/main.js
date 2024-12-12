@@ -1,34 +1,24 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Loading main.js...');
-    console.log('CONFIG object available:', CONFIG);
 
-    // Campaign Organization dependencies
-    const marketSelect = document.getElementById('market');
-    if (marketSelect) {
-        console.log('Market select found');
-        marketSelect.addEventListener('change', () => {
-            console.log('Market changed to:', marketSelect.value);
-            FormManager.updateBrandOptions();
-            FormManager.generateCampaignName(); // Auto-generate on change
-        });
-    }
-    
-    // Product Category dependency
-    const productCategory = document.getElementById('productCategory');
-    if (productCategory) {
-        productCategory.addEventListener('change', () => {
-            console.log('Product category changed to:', productCategory.value);
-            FormManager.updateSubCategories();
-            FormManager.generateAdSetName(); // Auto-generate on change
-        });
-    }
+    // Market change handler
+    document.getElementById('market')?.addEventListener('change', () => {
+        FormManager.updateBrandOptions();
+        FormManager.generateCampaignName();
+    });
 
-    // Brand change listener
+    // Brand change handler
     document.getElementById('brand')?.addEventListener('change', () => {
         FormManager.generateCampaignName();
     });
 
-    // Campaign timing listeners
+    // Media Objective change handler
+    document.getElementById('mediaObjective')?.addEventListener('change', () => {
+        FormManager.generateCampaignName();
+        FormManager.generateAdSetName();
+    });
+
+    // Campaign Timing handlers
     document.getElementById('financialYear')?.addEventListener('change', () => {
         FormManager.generateCampaignName();
     });
@@ -42,62 +32,42 @@ document.addEventListener('DOMContentLoaded', function() {
         FormManager.generateCampaignName();
     });
 
-    // Sub-category change listener
+    // Product Category handlers
+    document.getElementById('productCategory')?.addEventListener('change', () => {
+        FormManager.updateSubCategories();
+        FormManager.generateAdSetName();
+    });
+
     document.getElementById('subCategory')?.addEventListener('change', () => {
         FormManager.generateAdSetName();
     });
 
-    // Media objective change listener
-    document.getElementById('mediaObjective')?.addEventListener('change', () => {
-        FormManager.generateCampaignName();
-        FormManager.generateAdSetName();
-    });
-
-    // Buy type change listener
+    // Buy Type handler
     document.getElementById('buyType')?.addEventListener('change', () => {
         FormManager.generateAdSetName();
     });
 
-    // Source/Medium dependencies
-    const channelDropdown = document.getElementById('channelDropdown');
-    if (channelDropdown) {
-        channelDropdown.addEventListener('change', () => {
-            console.log('Channel changed to:', channelDropdown.value);
-            FormManager.updateChannelDependencies();
-        });
-    }
+    // Source/Medium handlers
+    document.getElementById('channelDropdown')?.addEventListener('change', () => {
+        FormManager.updateChannelDependencies();
+    });
 
-    const channelType = document.getElementById('channelType');
-    if (channelType) {
-        channelType.addEventListener('change', () => {
-            console.log('Channel type changed to:', channelType.value);
-            FormManager.updateBuyTypes();
-        });
-    }
+    document.getElementById('channelType')?.addEventListener('change', () => {
+        FormManager.updateBuyTypes();
+    });
 
     // Manual toggle handlers
-    const manualChannelToggle = document.getElementById('manualChannelToggle');
-    if (manualChannelToggle) {
-        manualChannelToggle.addEventListener('change', () => {
-            console.log('Manual channel toggle changed to:', manualChannelToggle.checked);
-            FormManager.toggleManualChannel();
-        });
-    }
+    document.getElementById('manualChannelToggle')?.addEventListener('change', () => {
+        FormManager.toggleManualChannel();
+    });
 
-    const manualUtmToggle = document.getElementById('manualUtmToggle');
-    if (manualUtmToggle) {
-        manualUtmToggle.addEventListener('change', () => {
-            console.log('Manual UTM toggle changed to:', manualUtmToggle.checked);
-            FormManager.toggleManualUtm();
-        });
-    }
+    document.getElementById('manualUtmToggle')?.addEventListener('change', () => {
+        FormManager.toggleManualUtm();
+    });
 
-    // Initialize all dropdowns
-    console.log('Initializing dropdowns...');
+    // Initialize dropdowns
     FormManager.updateBrandOptions();
     FormManager.updateSubCategories();
     FormManager.updateQuarterMonths();
     FormManager.updateChannelDependencies();
-
-    console.log('Initialization complete');
 });
