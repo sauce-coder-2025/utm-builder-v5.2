@@ -178,3 +178,5 @@ const CONFIG = {
         }
     }
 };
+
+console.log('CONFIG initialized:', typeof window.CONFIG !== 'undefined');
