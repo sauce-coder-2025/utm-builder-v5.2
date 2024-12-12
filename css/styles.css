@@ -148,6 +148,11 @@ h1 {
     white-space: nowrap;
 }
 
+.utm-log .table td {
+    white-space: normal;
+    word-wrap: break-word;
+}
+
 /* Generated UTM Section */
 .generated-utm {
     padding: 1rem;
