@@ -1,9 +1,7 @@
-console.log('Loading main.js...');
-console.log('CONFIG object available:', CONFIG);
-
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM Content Loaded');
-    
+    console.log('Loading main.js...');
+    console.log('CONFIG object available:', CONFIG);
+
     // Campaign Organization dependencies
     const marketSelect = document.getElementById('market');
     if (marketSelect) {
@@ -11,9 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
         marketSelect.addEventListener('change', () => {
             console.log('Market changed to:', marketSelect.value);
             FormManager.updateBrandOptions();
+            FormManager.generateCampaignName(); // Auto-generate on change
         });
-    } else {
-        console.error('Market select not found');
     }
     
     // Product Category dependency
@@ -22,17 +19,44 @@ document.addEventListener('DOMContentLoaded', function() {
         productCategory.addEventListener('change', () => {
             console.log('Product category changed to:', productCategory.value);
             FormManager.updateSubCategories();
+            FormManager.generateAdSetName(); // Auto-generate on change
         });
     }
 
-    // Quarter dependency
-    const quarterSelect = document.getElementById('quarter');
-    if (quarterSelect) {
-        quarterSelect.addEventListener('change', () => {
-            console.log('Quarter changed to:', quarterSelect.value);
-            FormManager.updateQuarterMonths();
-        });
-    }
+    // Brand change listener
+    document.getElementById('brand')?.addEventListener('change', () => {
+        FormManager.generateCampaignName();
+    });
+
+    // Campaign timing listeners
+    document.getElementById('financialYear')?.addEventListener('change', () => {
+        FormManager.generateCampaignName();
+    });
+
+    document.getElementById('quarter')?.addEventListener('change', () => {
+        FormManager.updateQuarterMonths();
+        FormManager.generateCampaignName();
+    });
+
+    document.getElementById('month')?.addEventListener('change', () => {
+        FormManager.generateCampaignName();
+    });
+
+    // Sub-category change listener
+    document.getElementById('subCategory')?.addEventListener('change', () => {
+        FormManager.generateAdSetName();
+    });
+
+    // Media objective change listener
+    document.getElementById('mediaObjective')?.addEventListener('change', () => {
+        FormManager.generateCampaignName();
+        FormManager.generateAdSetName();
+    });
+
+    // Buy type change listener
+    document.getElementById('buyType')?.addEventListener('change', () => {
+        FormManager.generateAdSetName();
+    });
 
     // Source/Medium dependencies
     const channelDropdown = document.getElementById('channelDropdown');
@@ -66,53 +90,6 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Manual UTM toggle changed to:', manualUtmToggle.checked);
             FormManager.toggleManualUtm();
         });
-    }
-
-    // Add Auto buttons to campaign structure section
-    // Campaign Name Auto button
-    const campaignNameInput = document.getElementById('campaignName');
-    const campaignNameWrapper = document.createElement('div');
-    campaignNameWrapper.className = 'input-group-auto';
-    
-    if (campaignNameInput) {
-        // Move the existing input
-        const parent = campaignNameInput.parentNode;
-        parent.removeChild(campaignNameInput);
-        
-        // Create and add the Auto button
-        const autoButton = document.createElement('button');
-        autoButton.type = 'button';
-        autoButton.className = 'auto-button btn btn-sm';
-        autoButton.textContent = 'Auto';
-        autoButton.onclick = () => FormManager.generateCampaignName();
-        
-        // Add button and input to wrapper
-        campaignNameWrapper.appendChild(autoButton);
-        campaignNameWrapper.appendChild(campaignNameInput);
-        parent.appendChild(campaignNameWrapper);
-    }
-
-    // Ad Set Auto button
-    const adSetInput = document.getElementById('adSet');
-    const adSetWrapper = document.createElement('div');
-    adSetWrapper.className = 'input-group-auto';
-    
-    if (adSetInput) {
-        // Move the existing input
-        const parent = adSetInput.parentNode;
-        parent.removeChild(adSetInput);
-        
-        // Create and add the Auto button
-        const autoButton = document.createElement('button');
-        autoButton.type = 'button';
-        autoButton.className = 'auto-button btn btn-sm';
-        autoButton.textContent = 'Auto';
-        autoButton.onclick = () => FormManager.generateAdSetName();
-        
-        // Add button and input to wrapper
-        adSetWrapper.appendChild(autoButton);
-        adSetWrapper.appendChild(adSetInput);
-        parent.appendChild(adSetWrapper);
     }
 
     // Initialize all dropdowns
