@@ -1,78 +1,76 @@
+// form-manager.js
 window.FormManager = class {
-    static initialize() {
-        console.log('Initializing FormManager');
-        this.attachEventListeners();
+    static logDebug(method, ...args) {
+        console.log(`FormManager.${method}:`, ...args);
     }
 
-    static attachEventListeners() {
-        // Market change handler
-        document.getElementById('market')?.addEventListener('change', () => {
-            this.updateBrandOptions();
-            this.generateCampaignName();
-        });
+    static generateCampaignName() {
+        this.logDebug('generateCampaignName', 'called');
+        
+        const market = document.getElementById('market').value;
+        const brand = document.getElementById('brand').value;
+        const financialYear = document.getElementById('financialYear').value;
+        const quarter = document.getElementById('quarter').value;
+        const month = document.getElementById('month').value;
+        const mediaObjective = document.getElementById('mediaObjective').value;
 
-        // Brand change handler
-        document.getElementById('brand')?.addEventListener('change', () => {
-            this.generateCampaignName();
-        });
+        if (!market || !brand || !financialYear || !quarter) {
+            this.logDebug('generateCampaignName', 'missing required fields');
+            return;
+        }
 
-        // Media Objective change handler
-        document.getElementById('mediaObjective')?.addEventListener('change', () => {
-            this.generateCampaignName();
-            this.generateAdSetName();
-        });
+        // Get brand abbreviation from config
+        const brandAbbr = CONFIG.abbreviations.markets[market]?.[brand];
+        if (!brandAbbr) {
+            this.logDebug('generateCampaignName', 'brand abbreviation not found', { market, brand });
+            return;
+        }
 
-        // Campaign Timing handlers
-        document.getElementById('financialYear')?.addEventListener('change', () => {
-            this.generateCampaignName();
-        });
+        // Get month and objective abbreviations
+        const monthAbbr = month ? CONFIG.abbreviations.month[month] : '';
+        const objectiveAbbr = mediaObjective ? CONFIG.abbreviations.mediaObjective[mediaObjective] : '';
 
-        document.getElementById('quarter')?.addEventListener('change', () => {
-            this.updateQuarterMonths();
-            this.generateCampaignName();
-        });
+        const campaignName = [brandAbbr, financialYear, quarter, monthAbbr, objectiveAbbr]
+            .filter(Boolean)
+            .join('_')
+            .toUpperCase();
 
-        document.getElementById('month')?.addEventListener('change', () => {
-            this.generateCampaignName();
-        });
+        this.logDebug('generateCampaignName', 'generated name:', campaignName);
+        document.getElementById('campaignName').value = campaignName;
+        this.updateUTMFields();
+    }
 
-        // Product Category handlers
-        document.getElementById('productCategory')?.addEventListener('change', () => {
-            this.updateSubCategories();
-            this.generateAdSetName();
-        });
+    static generateAdSetName() {
+        this.logDebug('generateAdSetName', 'called');
+        
+        const productCategory = document.getElementById('productCategory').value;
+        const subCategory = document.getElementById('subCategory').value;
+        const buyType = document.getElementById('buyType').value;
 
-        document.getElementById('subCategory')?.addEventListener('change', () => {
-            this.generateAdSetName();
-        });
+        if (!productCategory || !buyType) {
+            this.logDebug('generateAdSetName', 'missing required fields');
+            return;
+        }
 
-        // Buy Type handler
-        document.getElementById('buyType')?.addEventListener('change', () => {
-            this.generateAdSetName();
-        });
+        const categoryAbbr = CONFIG.abbreviations.category[productCategory];
+        const subCategoryAbbr = subCategory ? CONFIG.abbreviations.subCategory[subCategory] : '';
+        const buyTypeAbbr = CONFIG.abbreviations.buyType[buyType];
 
-        // Source/Medium handlers
-        document.getElementById('channelDropdown')?.addEventListener('change', () => {
-            this.updateChannelDependencies();
-        });
+        const adSetName = [categoryAbbr, subCategoryAbbr, buyTypeAbbr]
+            .filter(Boolean)
+            .join('_')
+            .toUpperCase();
 
-        document.getElementById('channelType')?.addEventListener('change', () => {
-            this.updateBuyTypes();
-        });
-
-        // Manual toggle handlers
-        document.getElementById('manualChannelToggle')?.addEventListener('change', () => {
-            this.toggleManualChannel();
-        });
-
-        document.getElementById('manualUtmToggle')?.addEventListener('change', () => {
-            this.toggleManualUtm();
-        });
+        this.logDebug('generateAdSetName', 'generated name:', adSetName);
+        document.getElementById('adSet').value = adSetName;
+        this.updateUTMFields();
     }
 
     static updateBrandOptions() {
         const market = document.getElementById('market').value;
         const brandSelect = document.getElementById('brand');
+        
+        this.logDebug('updateBrandOptions', { market });
         
         brandSelect.innerHTML = '<option value="">Select...</option>';
         if (market && CONFIG.marketBrands[market]) {
@@ -83,62 +81,74 @@ window.FormManager = class {
                 brandSelect.appendChild(option);
             });
         }
+
+        document.getElementById('campaignName').value = '';
+        this.updateUTMFields();
     }
 
     static updateSubCategories() {
         const category = document.getElementById('productCategory').value;
         const subCategorySelect = document.getElementById('subCategory');
-        const options = CONFIG.subCategories[category] || [];
+        
+        this.logDebug('updateSubCategories', { category });
         
         subCategorySelect.innerHTML = '<option value="">Select...</option>';
-        options.forEach(option => {
-            const option = document.createElement('option');
-            option.value = option;
-            option.textContent = option;
-            subCategorySelect.appendChild(option);
-        });
+        if (category && CONFIG.subCategories[category]) {
+            CONFIG.subCategories[category].forEach(subcat => {
+                const option = document.createElement('option');
+                option.value = subcat;
+                option.textContent = subcat;
+                subCategorySelect.appendChild(option);
+            });
+        }
 
+        document.getElementById('adSet').value = '';
         this.updateUTMFields();
     }
 
-    // Add all other methods from the previous FormManager class...
-
-    static generateCampaignName() {
-        const market = document.getElementById('market').value;
-        const brand = document.getElementById('brand').value;
-        const financialYear = document.getElementById('financialYear').value;
+    static updateQuarterMonths() {
         const quarter = document.getElementById('quarter').value;
-        const month = document.getElementById('month').value;
-        const mediaObjective = document.getElementById('mediaObjective').value;
-
-        if (!market || !brand || !financialYear || !quarter) return;
-
-        const brandAbbr = CONFIG.abbreviations.markets[market]?.[brand] || brand;
-        const monthAbbr = month ? CONFIG.abbreviations.month[month] : '';
-        const objectiveAbbr = mediaObjective ? CONFIG.abbreviations.mediaObjective[mediaObjective] : '';
-
-        const campaignElements = [brandAbbr, financialYear, quarter, monthAbbr, objectiveAbbr].filter(Boolean);
-        const campaignName = campaignElements.join('_').toUpperCase();
+        const monthSelect = document.getElementById('month');
         
-        document.getElementById('campaignName').value = campaignName;
+        this.logDebug('updateQuarterMonths', { quarter });
+        
+        monthSelect.innerHTML = '<option value="">Select...</option>';
+        if (quarter && CONFIG.quarterMonths[quarter]) {
+            CONFIG.quarterMonths[quarter].forEach(month => {
+                const option = document.createElement('option');
+                option.value = month;
+                option.textContent = month;
+                monthSelect.appendChild(option);
+            });
+        }
+
+        document.getElementById('campaignName').value = '';
         this.updateUTMFields();
     }
 
-    static generateAdSetName() {
-        const productCategory = document.getElementById('productCategory').value;
-        const subCategory = document.getElementById('subCategory').value;
-        const buyType = document.getElementById('buyType').value;
+    static updateUTMFields() {
+        const isManual = document.getElementById('manualUtmToggle').checked;
+        if (isManual) return;
 
-        if (!productCategory || !buyType) return;
+        const channelValue = document.getElementById('manualChannelToggle').checked ? 
+            document.getElementById('channelInput').value : 
+            document.getElementById('channelDropdown').value;
+        const channelType = document.getElementById('channelType').value;
+        const campaignName = document.getElementById('campaignName').value;
+        const adName = document.getElementById('adName').value;
 
-        const categoryAbbr = CONFIG.abbreviations.category[productCategory] || productCategory;
-        const subCategoryAbbr = subCategory ? CONFIG.abbreviations.subCategory[subCategory] : '';
-        const buyTypeAbbr = CONFIG.abbreviations.buyType[buyType] || buyType;
+        const fields = {
+            utmSource: channelValue,
+            utmMedium: channelType,
+            utmCampaign: campaignName,
+            utmContent: adName
+        };
 
-        const adSetElements = [categoryAbbr, subCategoryAbbr, buyTypeAbbr].filter(Boolean);
-        const adSetName = adSetElements.join('_').toUpperCase();
-        
-        document.getElementById('adSet').value = adSetName;
-        this.updateUTMFields();
+        Object.entries(fields).forEach(([id, value]) => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.value = Utils.formatUtmValue(value);
+            }
+        });
     }
-}
+};
