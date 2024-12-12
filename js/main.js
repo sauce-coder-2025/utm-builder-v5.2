@@ -75,4 +75,10 @@ document.addEventListener('DOMContentLoaded', function() {
     FormManager.updateSubCategories();
     FormManager.updateQuarterMonths();
     FormManager.updateUTMFields();
+}
+
+// Wait for DOM content to be loaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM Content Loaded, starting initialization...');
+    initializeApp();
 });
