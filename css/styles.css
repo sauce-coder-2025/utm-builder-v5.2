@@ -35,12 +35,12 @@ h1 {
 
 /* Main layout and form fixes */
 .col-md-8 {
-    width: 500px;
+    width: 600px;
     flex: 0 0 auto;
 }
 
 .col-md-4 {
-    width: 600px;
+    width: 1000px;
     flex: 0 0 auto;
 }
 
@@ -126,15 +126,14 @@ h1 {
 }
 
 .utm-url {
-    max-width: 200px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    min-width: 400px;  /* Ensures minimum width for URL column */
+    white-space: normal;  /* Allows text to wrap */
+    word-break: break-all;  /* Breaks long URLs */
 }
 
 .utm-actions {
+    width: 120px;  /* Fixed width for actions column */
     white-space: nowrap;
-    width: 1%;
 }
 
 .small-btn {
@@ -143,7 +142,7 @@ h1 {
 }
 
 .table td:not(.utm-url):not(.utm-actions) {
-    max-width: 150px;
+    max-width: 120px;  /* Makes other columns more compact */
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
