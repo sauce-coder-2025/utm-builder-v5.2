@@ -4,17 +4,6 @@ body {
     min-width: 1200px;
 }
 
-.logo-container {
-    max-width: 1200px;
-    padding: 1rem;
-    margin: 0 auto;
-}
-
-.logo-img {
-    max-height: 40px;
-    margin: 20px 0;
-}
-
 .container {
     max-width: 1200px;
     padding: 2rem;
@@ -62,6 +51,22 @@ body {
     max-width: 100% !important;
 }
 
+/* Campaign Timing Section */
+.campaign-timing-container {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.timing-item {
+    flex: 1;
+}
+
+.timing-item .form-select {
+    width: 100%;
+}
+
 /* UTM Log styling */
 .utm-log {
     width: 100%;
@@ -79,6 +84,32 @@ body {
 .utm-table {
     width: 100%;
     margin-top: 1rem;
+}
+
+.utm-url {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.utm-actions {
+    white-space: nowrap;
+}
+
+.small-btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Generated UTM Section */
+.generated-utm {
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+    word-break: break-all;
+    font-family: monospace;
+    font-size: 0.875rem;
 }
 
 /* Notifications */
@@ -99,6 +130,26 @@ body {
     font-size: 0.875rem;
     font-weight: 500;
     border: 1px solid #dee2e6;
+}
+
+.notification.hiding {
+    animation: slideOut 0.3s ease-in;
+}
+
+/* Table styling */
+.table {
+    margin-bottom: 0;
+    font-size: 0.875rem;
+}
+
+.table th {
+    font-weight: 600;
+    background-color: #f8f9fa;
+    border-bottom-width: 1px;
+}
+
+.table td {
+    vertical-align: middle;
 }
 
 /* Animations */
@@ -126,7 +177,20 @@ body {
 
 /* Responsive design */
 @media (max-width: 768px) {
-    .logo-img {
-        max-height: 30px;
+    body {
+        min-width: auto;
+    }
+
+    .col-md-8, .col-md-4 {
+        width: 100%;
+    }
+
+    .campaign-timing-container {
+        flex-direction: column;
+    }
+
+    .timing-item {
+        width: 100%;
+        margin-bottom: 1rem;
     }
 }
