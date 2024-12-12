@@ -35,12 +35,12 @@ h1 {
 
 /* Main layout and form fixes */
 .col-md-8 {
-    width: 600px;
+    width: 500px;
     flex: 0 0 auto;
 }
 
 .col-md-4 {
-    width: 1000px;
+    width: 900px;
     flex: 0 0 auto;
 }
 
