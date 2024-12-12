@@ -66,7 +66,6 @@ class UTMManager {
         
         // Add metadata
         formData.timestamp = new Date().toLocaleString();
-        formData.creator = 'Unknown User'; // You can modify this based on your user management system
         
         // Add UTM parameters
         formData.utmSource = document.getElementById('utmSource').value;
@@ -119,9 +118,10 @@ class UTMManager {
                     <i class="bi bi-trash"></i>
                 </button>
             </td>
-            <td>${formData.timestamp}</td>
-            <td>${formData.creator}</td>
             <td>${formData.utmCampaign}</td>
+            <td>${formData.utmSource}</td>
+            <td>${formData.utmMedium}</td>
+            <td>${formData.utmContent}</td>
             <td class="utm-url" title="${formData.utmString}">${formData.utmString}</td>
         `;
         
