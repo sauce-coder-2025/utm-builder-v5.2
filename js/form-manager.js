@@ -77,6 +77,7 @@ class FormManager {
 
     static updateChannelDependencies() {
         console.log('Updating channel dependencies');
+        const isManual = document.getElementById('manualChannelToggle').checked;
         const channel = document.getElementById('channelDropdown').value;
         const channelTypeSelect = document.getElementById('channelType');
         const mediaObjectiveSelect = document.getElementById('mediaObjective');
@@ -92,7 +93,24 @@ class FormManager {
         mediaObjectiveSelect.innerHTML = '<option value="">Select...</option>';
         buyTypeSelect.innerHTML = '<option value="">Select...</option>';
 
-        if (channel && CONFIG.channelDependencies[channel]) {
+        // Always add media objectives
+        const objectives = ['Attract', 'Engage', 'Convert', 'Retain'];
+        objectives.forEach(objective => {
+            const option = document.createElement('option');
+            option.value = objective;
+            option.textContent = objective;
+            mediaObjectiveSelect.appendChild(option);
+        });
+
+        if (isManual) {
+            // Add manual channel types
+            CONFIG.manualChannelTypes.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = type;
+                channelTypeSelect.appendChild(option);
+            });
+        } else if (channel && CONFIG.channelDependencies[channel]) {
             const dependencies = CONFIG.channelDependencies[channel];
             
             // Update channel types
@@ -101,14 +119,6 @@ class FormManager {
                 option.value = type;
                 option.textContent = type;
                 channelTypeSelect.appendChild(option);
-            });
-
-            // Update media objectives
-            dependencies.mediaObjectives.forEach(objective => {
-                const option = document.createElement('option');
-                option.value = objective;
-                option.textContent = objective;
-                mediaObjectiveSelect.appendChild(option);
             });
 
             // Update buy types
@@ -186,17 +196,35 @@ class FormManager {
         const isManual = document.getElementById('manualChannelToggle').checked;
         const dropdownDiv = document.getElementById('channelDropdown');
         const inputDiv = document.getElementById('channelInput');
+        const channelTypeSelect = document.getElementById('channelType');
+        const buyTypeSelect = document.getElementById('buyType');
 
         dropdownDiv.style.display = isManual ? 'none' : 'block';
         inputDiv.style.display = isManual ? 'block' : 'none';
         
         if (isManual) {
             inputDiv.value = '';
-        } else {
             dropdownDiv.value = '';
+            this.updateChannelDependencies();
+        } else {
+            inputDiv.value = '';
+            this.updateChannelDependencies();
         }
-        
-        this.updateChannelDependencies();
+
+        // Add event listener for manual channel type changes
+        channelTypeSelect.addEventListener('change', () => {
+            const selectedType = channelTypeSelect.value;
+            buyTypeSelect.innerHTML = '<option value="">Select...</option>';
+            
+            if (isManual && selectedType && CONFIG.manualBuyTypes[selectedType]) {
+                CONFIG.manualBuyTypes[selectedType].forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type;
+                    option.textContent = type;
+                    buyTypeSelect.appendChild(option);
+                });
+            }
+        });
     }
 
     static toggleManualUtm() {
