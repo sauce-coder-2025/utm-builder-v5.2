@@ -10,6 +10,29 @@ body {
     width: 100%;
 }
 
+/* Logo section */
+.logo-container {
+    padding: 2rem 0;
+    margin-bottom: 2rem;
+}
+
+.fp-logo {
+    max-width: 300px;
+    height: auto;
+    margin-bottom: 1rem;
+}
+
+.fp-logo text {
+    font-family: Arial, sans-serif;
+    letter-spacing: 2px;
+}
+
+h1 {
+    font-size: 1.75rem;
+    color: #333;
+    margin-top: 1rem;
+}
+
 /* Main layout and form fixes */
 .col-md-8 {
     width: 500px;
@@ -67,7 +90,7 @@ body {
     width: 100%;
 }
 
-/* UTM Log styling */
+/* UTM Log Table Styles */
 .utm-log {
     width: 100%;
     background-color: #ffffff;
@@ -81,9 +104,25 @@ body {
     margin-top: 2rem;
 }
 
-.utm-table {
+.table {
+    font-size: 0.875rem;
     width: 100%;
-    margin-top: 1rem;
+    margin-bottom: 0;
+}
+
+.table th {
+    font-weight: 600;
+    background-color: #f8f9fa;
+    white-space: nowrap;
+    padding: 0.75rem;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.table td {
+    padding: 0.75rem;
+    vertical-align: middle;
 }
 
 .utm-url {
@@ -95,11 +134,19 @@ body {
 
 .utm-actions {
     white-space: nowrap;
+    width: 1%;
 }
 
 .small-btn {
     padding: 0.25rem 0.5rem;
     font-size: 0.875rem;
+}
+
+.table td:not(.utm-url):not(.utm-actions) {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Generated UTM Section */
@@ -136,22 +183,6 @@ body {
     animation: slideOut 0.3s ease-in;
 }
 
-/* Table styling */
-.table {
-    margin-bottom: 0;
-    font-size: 0.875rem;
-}
-
-.table th {
-    font-weight: 600;
-    background-color: #f8f9fa;
-    border-bottom-width: 1px;
-}
-
-.table td {
-    vertical-align: middle;
-}
-
 /* Animations */
 @keyframes slideIn {
     from {
@@ -175,6 +206,11 @@ body {
     }
 }
 
+/* Table Hover Effects */
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
     body {
@@ -193,4 +229,15 @@ body {
         width: 100%;
         margin-bottom: 1rem;
     }
+
+    .utm-log {
+        margin-top: 2rem;
+        height: 400px;
+    }
+}
+
+/* Table Responsive Scrolling */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
