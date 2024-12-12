@@ -10,11 +10,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize form manager
     FormManager.initialize();
     
-    // Attach event listeners for dropdowns
     // Market chain
     document.getElementById('market')?.addEventListener('change', () => {
         console.log('Market changed');
         FormManager.updateBrandOptions();
+        FormManager.generateCampaignName();
+    });
+
+    // Brand chain
+    document.getElementById('brand')?.addEventListener('change', () => {
+        console.log('Brand changed');
         FormManager.generateCampaignName();
     });
 
@@ -38,47 +43,73 @@ document.addEventListener('DOMContentLoaded', function() {
         FormManager.updateChannelDependencies();
     });
 
-    // Campaign name generation triggers
-    const campaignNameTriggers = ['brand', 'financialYear', 'month', 'mediaObjective'];
-    campaignNameTriggers.forEach(triggerId => {
-        document.getElementById(triggerId)?.addEventListener('change', () => {
-            console.log(`${triggerId} changed - updating campaign name`);
-            FormManager.generateCampaignName();
-        });
+    // Financial Year handler
+    document.getElementById('financialYear')?.addEventListener('change', () => {
+        console.log('Financial year changed');
+        FormManager.generateCampaignName();
     });
 
-    // Ad set name generation triggers
-    const adSetNameTriggers = ['subCategory', 'buyType'];
-    adSetNameTriggers.forEach(triggerId => {
-        document.getElementById(triggerId)?.addEventListener('change', () => {
-            console.log(`${triggerId} changed - updating ad set name`);
-            FormManager.generateAdSetName();
-        });
+    // Month handler
+    document.getElementById('month')?.addEventListener('change', () => {
+        console.log('Month changed');
+        FormManager.generateCampaignName();
+    });
+
+    // Media Objective handler
+    document.getElementById('mediaObjective')?.addEventListener('change', () => {
+        console.log('Media objective changed');
+        FormManager.generateCampaignName();
+        FormManager.generateAdSetName();
+    });
+
+    // Sub Category handler
+    document.getElementById('subCategory')?.addEventListener('change', () => {
+        console.log('Sub category changed');
+        FormManager.generateAdSetName();
+    });
+
+    // Buy Type handler
+    document.getElementById('buyType')?.addEventListener('change', () => {
+        console.log('Buy type changed');
+        FormManager.generateAdSetName();
     });
 
     // UTM field triggers
     document.getElementById('channelType')?.addEventListener('change', () => {
+        console.log('Channel type changed');
         FormManager.updateUTMFields();
     });
 
     document.getElementById('campaignName')?.addEventListener('input', () => {
+        console.log('Campaign name changed');
         FormManager.updateUTMFields();
     });
 
     document.getElementById('adName')?.addEventListener('input', () => {
+        console.log('Ad name changed');
         FormManager.updateUTMFields();
     });
 
     // Manual toggle handlers
     document.getElementById('manualChannelToggle')?.addEventListener('change', () => {
+        console.log('Manual channel toggle changed');
         FormManager.toggleManualChannel();
     });
 
     document.getElementById('manualUtmToggle')?.addEventListener('change', () => {
+        console.log('Manual UTM toggle changed');
         FormManager.toggleManualUtm();
     });
 
     // Initialize all dropdowns
     console.log('Initializing dropdowns...');
     FormManager.initializeDropdowns();
+});
+
+// Add window load debug logging
+window.addEventListener('load', function() {
+    console.log('Window loaded');
+    console.log('CONFIG loaded:', typeof CONFIG !== 'undefined');
+    console.log('FormManager loaded:', typeof FormManager !== 'undefined');
+    console.log('Utils loaded:', typeof Utils !== 'undefined');
 });
