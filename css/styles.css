@@ -126,7 +126,7 @@ h1 {
 }
 
 .utm-url {
-    min-width: 400px;  /* Ensures minimum width for URL column */
+    min-width: 1000px;  /* Ensures minimum width for URL column */
     white-space: normal;  /* Allows text to wrap */
     word-break: break-all;  /* Breaks long URLs */
 }
