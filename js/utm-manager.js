@@ -112,6 +112,9 @@ class UTMManager {
                 <button class="btn btn-sm btn-outline-primary me-2 small-btn" onclick="utmManager.copyUTM(this)" title="Copy UTM">
                     <i class="bi bi-clipboard"></i>
                 </button>
+                <button class="btn btn-sm btn-outline-warning me-2 small-btn" onclick="utmManager.testUTM(this)" title="Test UTM">
+                    🧪
+                </button>
                 <button class="btn btn-sm btn-outline-danger small-btn" onclick="utmManager.deleteUTM(this)" title="Delete UTM">
                     <i class="bi bi-trash"></i>
                 </button>
@@ -130,6 +133,12 @@ class UTMManager {
         console.log('Copying UTM');
         const utmString = button.closest('tr').querySelector('.utm-url').title;
         Utils.copyToClipboard(utmString);
+    }
+
+    testUTM(button) {
+        console.log('Testing UTM');
+        const utmString = button.closest('tr').querySelector('.utm-url').title;
+        window.open(utmString, '_blank');
     }
 
     deleteUTM(button) {
