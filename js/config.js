@@ -1,4 +1,15 @@
 const CONFIG = {
+    // Market-Brand dependencies
+    marketBrands: {
+        'AU': ['F&P', 'Haier', 'Haier Home', 'Home Solutions', 'DCS'],
+        'NZ': ['F&P', 'Haier', 'Haier Home', 'Home Solutions'],
+        'US': ['F&P', 'DCS'],
+        'UK': ['F&P'],
+        'CA': ['F&P', 'DCS'],
+        'SG': ['F&P'],
+        'GBL': ['F&P', 'Haier', 'Haier Home', 'Home Solutions', 'DCS']
+    },
+
     // Product category dependencies
     subCategories: {
         'Cooling': ['Refrigeration', 'Wine', 'Chest Freezer'],
@@ -11,17 +22,6 @@ const CONFIG = {
         'Promotions': []
     },
 
-    // Market-Brand dependencies
-    marketBrands: {
-        'AU': ['F&P', 'Haier', 'Haier Home', 'Home Solutions', 'DCS'],
-        'NZ': ['F&P', 'Haier', 'Haier Home', 'Home Solutions'],
-        'US': ['F&P', 'DCS'],
-        'UK': ['F&P'],
-        'CA': ['F&P', 'DCS'],
-        'SG': ['F&P'],
-        'GBL': ['F&P', 'Haier', 'Haier Home', 'Home Solutions', 'DCS']
-    },
-
     // Quarter-Month dependencies
     quarterMonths: {
         'Q1': ['January', 'February', 'March'],
@@ -30,7 +30,7 @@ const CONFIG = {
         'Q4': ['October', 'November', 'December']
     },
 
-    // Source (Channel) dependencies
+    // Channel dependencies
     channelDependencies: {
         'Meta': {
             channelTypes: ['Paid Social', 'Social'],
@@ -69,7 +69,7 @@ const CONFIG = {
         }
     },
 
-    // Manual channel types and buy types
+    // Manual channel settings
     manualChannelTypes: ['Offline', 'Partnership'],
     manualBuyTypes: {
         'Offline': ['QR Code'],
@@ -78,6 +78,7 @@ const CONFIG = {
 
     // Abbreviations for name generation
     abbreviations: {
+        // Market-specific brand abbreviations
         markets: {
             'AU': {
                 'F&P': 'FPAU',
@@ -114,12 +115,14 @@ const CONFIG = {
                 'DCS': 'DCSGBL'
             }
         },
+        // Media objective abbreviations
         mediaObjective: {
             'Attract': 'ATT',
             'Engage': 'ENG',
             'Convert': 'CON',
             'Retain': 'RET'
         },
+        // Month abbreviations
         month: {
             'January': 'JAN',
             'February': 'FEB',
@@ -134,6 +137,7 @@ const CONFIG = {
             'November': 'NOV',
             'December': 'DEC'
         },
+        // Buy type abbreviations
         buyType: {
             'QR Code': 'QR',
             'Email': 'EMAIL',
@@ -147,6 +151,7 @@ const CONFIG = {
             'Engagement': 'ENG',
             'Video Views': 'VIDV'
         },
+        // Category abbreviations
         category: {
             'Cooling': 'COOL',
             'Cooking': 'COOK',
@@ -157,6 +162,7 @@ const CONFIG = {
             'Accessories': 'ACC',
             'Promotions': 'PROMO'
         },
+        // Subcategory abbreviations
         subCategory: {
             'Refrigeration': 'REF',
             'Wine': 'WINE',
@@ -178,5 +184,3 @@ const CONFIG = {
         }
     }
 };
-
-console.log('CONFIG initialized:', typeof window.CONFIG !== 'undefined');
