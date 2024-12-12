@@ -179,7 +179,10 @@ class FormManager {
         console.log('Updating UTM fields');
         if (document.getElementById('manualUtmToggle').checked) return;
 
-        const channel = document.getElementById('channelDropdown').value;
+        const isManualChannel = document.getElementById('manualChannelToggle').checked;
+        const channel = isManualChannel 
+            ? document.getElementById('channelInput').value 
+            : document.getElementById('channelDropdown').value;
         const channelType = document.getElementById('channelType').value;
         const campaignName = document.getElementById('campaignName').value;
         const adName = document.getElementById('adName').value;
@@ -205,13 +208,19 @@ class FormManager {
         if (isManual) {
             inputDiv.value = '';
             dropdownDiv.value = '';
+            
+            // Add event listener for manual input changes
+            inputDiv.addEventListener('input', () => {
+                this.updateUTMFields();
+            });
+            
             this.updateChannelDependencies();
         } else {
             inputDiv.value = '';
             this.updateChannelDependencies();
         }
 
-        // Add event listener for manual channel type changes
+        // Add event listener for channel type changes
         channelTypeSelect.addEventListener('change', () => {
             const selectedType = channelTypeSelect.value;
             buyTypeSelect.innerHTML = '<option value="">Select...</option>';
@@ -224,6 +233,7 @@ class FormManager {
                     buyTypeSelect.appendChild(option);
                 });
             }
+            this.updateUTMFields();
         });
     }
 
