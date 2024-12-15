@@ -2,20 +2,77 @@ class UTMManager {
     constructor() {
         // Initialize Firebase reference
         this.utmCollection = firebase.firestore().collection('utm_strings');
-        
-        // Clear the UTM log on page load
+        console.log('UTM Manager initialized');
         this.clearUTMLog();
     }
 
     clearUTMLog() {
+        console.log('Clearing UTM log...');
         const utmLog = document.getElementById('utmLog');
         if (utmLog) {
+            while (utmLog.firstChild) {
+                utmLog.removeChild(utmLog.firstChild);
+            }
             utmLog.innerHTML = '';
+            console.log('UTM log cleared');
         }
     }
 
     generateUTM() {
-        // Your existing generateUTM code...
+        console.log('Generating UTM URL');
+        const formData = FormManager.getFormData();
+        const utmSource = document.getElementById('utmSource').value.toLowerCase();
+        const utmMedium = document.getElementById('utmMedium').value.toLowerCase();
+        const utmCampaign = document.getElementById('utmCampaign').value.toLowerCase();
+        const utmContent = document.getElementById('utmContent').value.toLowerCase();
+        const utmTerm = document.getElementById('utmTerm').value.toLowerCase();
+
+        // Validate required fields
+        if (!formData.baseUrl) {
+            Utils.showNotification('Please enter a Base URL');
+            return;
+        }
+
+        if (!utmSource || !utmMedium || !utmCampaign) {
+            Utils.showNotification('Please ensure Source, Medium, and Campaign fields are filled');
+            return;
+        }
+
+        try {
+            // Create and validate URL
+            const url = new URL(formData.baseUrl.toLowerCase());
+            
+            // Add UTM parameters
+            url.searchParams.set('utm_source', Utils.formatUtmValue(utmSource));
+            url.searchParams.set('utm_medium', Utils.formatUtmValue(utmMedium));
+            url.searchParams.set('utm_campaign', Utils.formatUtmValue(utmCampaign));
+            
+            if (utmContent) {
+                url.searchParams.set('utm_content', Utils.formatUtmValue(utmContent));
+            }
+            if (utmTerm) {
+                url.searchParams.set('utm_term', Utils.formatUtmValue(utmTerm));
+            }
+
+            // Show the generated UTM section
+            const generatedUtm = document.getElementById('generatedUtm');
+            const generatedUtmSection = document.getElementById('generatedUtmSection');
+            
+            if (!generatedUtm || !generatedUtmSection) {
+                console.error('Generated UTM elements not found');
+                return;
+            }
+            
+            generatedUtm.textContent = url.toString();
+            generatedUtmSection.style.display = 'block';
+            
+            // Scroll to the generated UTM
+            generatedUtmSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+        } catch (error) {
+            console.error('URL generation error:', error);
+            Utils.showNotification('Invalid URL format. Please check the Base URL.');
+        }
     }
 
     async saveUTM() {
@@ -96,7 +153,42 @@ class UTMManager {
         utmLog.parentElement.scrollTop = utmLog.parentElement.scrollHeight;
     }
 
-    // Your existing copy, test, and delete methods...
+    copyUTM(button) {
+        console.log('Copying UTM');
+        const utmString = button.closest('tr').querySelector('.utm-url').title;
+        Utils.copyToClipboard(utmString);
+    }
+
+    testUTM(button) {
+        console.log('Testing UTM');
+        const utmString = button.closest('tr').querySelector('.utm-url').title;
+        window.open(utmString, '_blank');
+    }
+
+    async deleteUTM(button) {
+        console.log('Deleting UTM');
+        const row = button.closest('tr');
+        const utmString = row.querySelector('.utm-url').title;
+        
+        try {
+            // Find and delete from Firebase
+            const querySnapshot = await this.utmCollection
+                .where('utmString', '==', utmString)
+                .get();
+
+            querySnapshot.forEach(async (doc) => {
+                await doc.ref.delete();
+            });
+            
+            // Remove from UI
+            row.remove();
+            
+            Utils.showNotification('UTM deleted successfully');
+        } catch (error) {
+            console.error('Error deleting UTM:', error);
+            Utils.showNotification('Error deleting UTM');
+        }
+    }
 
     async completeSession() {
         console.log('Completing UTM session');
@@ -108,7 +200,7 @@ class UTMManager {
 
         try {
             Utils.clearForm();
-            this.clearUTMLog(); // Clear the log
+            this.clearUTMLog();
             Utils.showNotification('Session completed successfully');
         } catch (error) {
             console.error('Session completion error:', error);
@@ -123,6 +215,18 @@ class UTMManager {
 
 // Initialize UTM Manager
 const utmManager = new UTMManager();
+
+// Clear logs when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('Page loaded, clearing logs...');
+    utmManager.clearUTMLog();
+});
+
+// Clear logs when page refreshes
+window.addEventListener('load', () => {
+    console.log('Page refreshed, clearing logs...');
+    utmManager.clearUTMLog();
+});
 
 // Add to window object
 if (typeof window !== 'undefined') {
