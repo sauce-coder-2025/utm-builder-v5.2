@@ -25,27 +25,30 @@ class UTMViewer {
         this.loadUTMs();
     }
 
-    async loadFilterOptions() {
-        try {
-            console.log('Loading filter options');
-            const snapshot = await this.utmCollection.get();
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                console.log('Processing document for filters:', data);
-                Object.keys(this.filterOptions).forEach(filterKey => {
-                    if (data[filterKey]) {
-                        this.filterOptions[filterKey].add(data[filterKey]);
-                    }
+        async loadFilterOptions() {
+            try {
+                console.log('Loading filter options');
+                const snapshot = await this.utmCollection.get();
+                
+                if (snapshot.empty) throw new Error('No data found.');
+        
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    console.log('Processing document for filters:', data);
+        
+                    Object.keys(this.filterOptions).forEach(filterKey => {
+                        if (data[filterKey]) this.filterOptions[filterKey].add(data[filterKey]);
+                    });
                 });
-            });
-
-            console.log('Populated filters:', this.filterOptions);
-            this.populateFilterDropdowns();
-        } catch (error) {
-            console.error('Error loading filter options:', error);
-            this.showNotification('Error loading filter options: ' + error.message);
+        
+                console.log('Populated filters:', this.filterOptions);
+                this.populateFilterDropdowns();
+                this.loadUTMs(); // Ensure UTMs load after filters are set
+            } catch (error) {
+                console.error('Error loading filter options:', error);
+                this.showNotification('Error loading filters: ' + error.message);
+            }
         }
-    }
 
     populateFilterDropdowns() {
         Object.keys(this.filterOptions).forEach(filterKey => {
