@@ -16,9 +16,7 @@ class UTMViewer {
             quarter: new Set(),
             month: new Set(),
             utmSource: new Set(),
-            utmMedium: new Set(),
-            productCategory: new Set(),
-            mediaObjective: new Set()
+            utmMedium: new Set()
         };
         this.initializeEventListeners();
         this.loadFilterOptions();
@@ -28,16 +26,16 @@ class UTMViewer {
     async loadFilterOptions() {
         try {
             console.log('Loading filter options');
-            const snapshot = await this.utmCollection.get();
-            snapshot.forEach(doc => {
-                const data = doc.data();
+            const snapshot = await this.utmCollection.limit(1).get();
+            if (!snapshot.empty) {
+                const data = snapshot.docs[0].data();
                 console.log('Processing document for filters:', data);
                 Object.keys(this.filterOptions).forEach(filterKey => {
-                    if (data[filterKey]) {
+                    if (data.hasOwnProperty(filterKey)) {
                         this.filterOptions[filterKey].add(data[filterKey]);
                     }
                 });
-            });
+            }
 
             console.log('Populated filters:', this.filterOptions);
             this.populateFilterDropdowns();
@@ -80,7 +78,7 @@ class UTMViewer {
         const filterFields = [
             'filterMarket', 'filterBrand', 'filterCampaignName', 'filterChannel',
             'filterChannelType', 'filterFinancialYear', 'filterQuarter', 'filterMonth',
-            'filterUtmSource', 'filterUtmMedium', 'filterProductCategory', 'filterMediaObjective'
+            'filterUtmSource', 'filterUtmMedium'
         ];
 
         // Filter change listeners
@@ -136,7 +134,7 @@ class UTMViewer {
                 Object.keys(this.filters).forEach(filterKey => {
                     if (data[filterKey] === this.filters[filterKey]) {
                         Object.keys(updatedOptions).forEach(optionKey => {
-                            if (data[optionKey]) {
+                            if (data.hasOwnProperty(optionKey)) {
                                 updatedOptions[optionKey].add(data[optionKey]);
                             }
                         });
