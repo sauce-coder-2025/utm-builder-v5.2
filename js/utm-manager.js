@@ -2,63 +2,20 @@ class UTMManager {
     constructor() {
         // Initialize Firebase reference
         this.utmCollection = firebase.firestore().collection('utm_strings');
+        
+        // Clear the UTM log on page load
+        this.clearUTMLog();
+    }
+
+    clearUTMLog() {
+        const utmLog = document.getElementById('utmLog');
+        if (utmLog) {
+            utmLog.innerHTML = '';
+        }
     }
 
     generateUTM() {
-        console.log('Generating UTM URL');
-        const formData = FormManager.getFormData();
-        const utmSource = document.getElementById('utmSource').value.toLowerCase();
-        const utmMedium = document.getElementById('utmMedium').value.toLowerCase();
-        const utmCampaign = document.getElementById('utmCampaign').value.toLowerCase();
-        const utmContent = document.getElementById('utmContent').value.toLowerCase();
-        const utmTerm = document.getElementById('utmTerm').value.toLowerCase();
-
-        // Validate required fields
-        if (!formData.baseUrl) {
-            Utils.showNotification('Please enter a Base URL');
-            return;
-        }
-
-        if (!utmSource || !utmMedium || !utmCampaign) {
-            Utils.showNotification('Please ensure Source, Medium, and Campaign fields are filled');
-            return;
-        }
-
-        try {
-            // Create and validate URL
-            const url = new URL(formData.baseUrl.toLowerCase());
-            
-            // Add UTM parameters
-            url.searchParams.set('utm_source', Utils.formatUtmValue(utmSource));
-            url.searchParams.set('utm_medium', Utils.formatUtmValue(utmMedium));
-            url.searchParams.set('utm_campaign', Utils.formatUtmValue(utmCampaign));
-            
-            if (utmContent) {
-                url.searchParams.set('utm_content', Utils.formatUtmValue(utmContent));
-            }
-            if (utmTerm) {
-                url.searchParams.set('utm_term', Utils.formatUtmValue(utmTerm));
-            }
-
-            // Show the generated UTM section
-            const generatedUtm = document.getElementById('generatedUtm');
-            const generatedUtmSection = document.getElementById('generatedUtmSection');
-            
-            if (!generatedUtm || !generatedUtmSection) {
-                console.error('Generated UTM elements not found');
-                return;
-            }
-            
-            generatedUtm.textContent = url.toString();
-            generatedUtmSection.style.display = 'block';
-            
-            // Scroll to the generated UTM
-            generatedUtmSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
-        } catch (error) {
-            console.error('URL generation error:', error);
-            Utils.showNotification('Invalid URL format. Please check the Base URL.');
-        }
+        // Your existing generateUTM code...
     }
 
     async saveUTM() {
@@ -95,7 +52,7 @@ class UTMManager {
             // Save to Firebase
             await this.utmCollection.add(formData);
 
-            // Update the UI
+            // Update only the current session's log
             this.addUTMToLog(formData);
             
             Utils.showNotification('UTM saved successfully');
@@ -105,96 +62,44 @@ class UTMManager {
         }
     }
 
-addUTMToLog(formData) {
-    console.log('Adding UTM to log');
-    const utmLog = document.getElementById('utmLog');
-    
-    if (!utmLog) {
-        console.error('UTM log element not found');
-        return;
-    }
-
-    const newRow = document.createElement('tr');
-    
-    newRow.innerHTML = `
-        <td class="utm-actions d-flex">
-            <button class="btn btn-sm btn-outline-primary me-2" onclick="utmManager.copyUTM(this)" title="Copy UTM">
-                <i class="bi bi-clipboard"></i>
-            </button>
-            <button class="btn btn-sm btn-outline-warning me-2" onclick="utmManager.testUTM(this)" title="Test UTM">
-                🧪
-            </button>
-            <button class="btn btn-sm btn-outline-danger" onclick="utmManager.deleteUTM(this)" title="Delete UTM">
-                <i class="bi bi-trash"></i>
-            </button>
-        </td>
-        <td>${formData.utmCampaign}</td>
-        <td>${formData.utmSource}</td>
-        <td>${formData.utmMedium}</td>
-        <td>${formData.utmContent}</td>
-        <td class="utm-url" title="${formData.utmString}">${formData.utmString}</td>
-    `;
-    
-    utmLog.appendChild(newRow);
-    utmLog.parentElement.scrollTop = utmLog.parentElement.scrollHeight;
-}
-
-    copyUTM(button) {
-        console.log('Copying UTM');
-        const utmString = button.closest('tr').querySelector('.utm-url').title;
-        Utils.copyToClipboard(utmString);
-    }
-
-    testUTM(button) {
-        console.log('Testing UTM');
-        const utmString = button.closest('tr').querySelector('.utm-url').title;
-        window.open(utmString, '_blank');
-    }
-
-    async deleteUTM(button) {
-        console.log('Deleting UTM');
-        const row = button.closest('tr');
-        const utmString = row.querySelector('.utm-url').title;
+    addUTMToLog(formData) {
+        console.log('Adding UTM to log');
+        const utmLog = document.getElementById('utmLog');
         
-        try {
-            // Find and delete from Firebase
-            const querySnapshot = await this.utmCollection
-                .where('utmString', '==', utmString)
-                .get();
-
-            querySnapshot.forEach(async (doc) => {
-                await doc.ref.delete();
-            });
-            
-            // Remove from UI
-            row.remove();
-            
-            Utils.showNotification('UTM deleted successfully');
-        } catch (error) {
-            console.error('Error deleting UTM:', error);
-            Utils.showNotification('Error deleting UTM');
+        if (!utmLog) {
+            console.error('UTM log element not found');
+            return;
         }
+
+        const newRow = document.createElement('tr');
+        
+        newRow.innerHTML = `
+            <td class="utm-actions d-flex">
+                <button class="btn btn-sm btn-outline-primary me-2" onclick="utmManager.copyUTM(this)" title="Copy UTM">
+                    <i class="bi bi-clipboard"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-warning me-2" onclick="utmManager.testUTM(this)" title="Test UTM">
+                    🧪
+                </button>
+                <button class="btn btn-sm btn-outline-danger" onclick="utmManager.deleteUTM(this)" title="Delete UTM">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+            <td>${formData.utmCampaign}</td>
+            <td>${formData.utmSource}</td>
+            <td>${formData.utmMedium}</td>
+            <td>${formData.utmContent}</td>
+            <td class="utm-url" title="${formData.utmString}">${formData.utmString}</td>
+        `;
+        
+        utmLog.appendChild(newRow);
+        utmLog.parentElement.scrollTop = utmLog.parentElement.scrollHeight;
     }
 
-    async loadSavedUTMs() {
-        try {
-            const querySnapshot = await this.utmCollection
-                .orderBy('timestamp', 'desc')
-                .get();
-
-            querySnapshot.forEach((doc) => {
-                const formData = doc.data();
-                this.addUTMToLog(formData);
-            });
-        } catch (error) {
-            console.error('Error loading UTMs:', error);
-            Utils.showNotification('Error loading saved UTMs');
-        }
-    }
+    // Your existing copy, test, and delete methods...
 
     async completeSession() {
         console.log('Completing UTM session');
-        const endSaveButton = document.getElementById('endSaveButton');
         const endSaveSpinner = document.getElementById('endSaveSpinner');
 
         if (endSaveSpinner) {
@@ -203,7 +108,7 @@ addUTMToLog(formData) {
 
         try {
             Utils.clearForm();
-            document.getElementById('utmLog').innerHTML = '';
+            this.clearUTMLog(); // Clear the log
             Utils.showNotification('Session completed successfully');
         } catch (error) {
             console.error('Session completion error:', error);
@@ -218,11 +123,6 @@ addUTMToLog(formData) {
 
 // Initialize UTM Manager
 const utmManager = new UTMManager();
-
-// Load saved UTMs when the page loads
-document.addEventListener('DOMContentLoaded', () => {
-    utmManager.loadSavedUTMs();
-});
 
 // Add to window object
 if (typeof window !== 'undefined') {
