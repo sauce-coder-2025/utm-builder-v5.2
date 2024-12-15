@@ -3,7 +3,23 @@ class UTMManager {
         // Initialize Firebase reference
         this.utmCollection = firebase.firestore().collection('utm_strings');
         console.log('UTM Manager initialized');
+        
+        // Track only current session UTMs
+        this.sessionUTMs = new Set();
+        
+        // Make sure the log is empty at start
         this.clearUTMLog();
+        
+        // Remove any Firebase listeners/subscriptions
+        this.unsubscribeFirebase();
+    }
+
+    unsubscribeFirebase() {
+        // Unsubscribe from any existing Firebase listeners
+        if (this.unsubscribe) {
+            this.unsubscribe();
+            this.unsubscribe = null;
+        }
     }
 
     clearUTMLog() {
@@ -106,10 +122,11 @@ class UTMManager {
                 return;
             }
 
-            // Save to Firebase
-            await this.utmCollection.add(formData);
+            // Save to Firebase and track in session
+            const docRef = await this.utmCollection.add(formData);
+            this.sessionUTMs.add(docRef.id);
 
-            // Update only the current session's log
+            // Only show in log if it's from this session
             this.addUTMToLog(formData);
             
             Utils.showNotification('UTM saved successfully');
@@ -177,6 +194,8 @@ class UTMManager {
                 .get();
 
             querySnapshot.forEach(async (doc) => {
+                // Remove from session tracking
+                this.sessionUTMs.delete(doc.id);
                 await doc.ref.delete();
             });
             
@@ -201,6 +220,7 @@ class UTMManager {
         try {
             Utils.clearForm();
             this.clearUTMLog();
+            this.sessionUTMs.clear();
             Utils.showNotification('Session completed successfully');
         } catch (error) {
             console.error('Session completion error:', error);
@@ -215,18 +235,6 @@ class UTMManager {
 
 // Initialize UTM Manager
 const utmManager = new UTMManager();
-
-// Clear logs when page loads
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('Page loaded, clearing logs...');
-    utmManager.clearUTMLog();
-});
-
-// Clear logs when page refreshes
-window.addEventListener('load', () => {
-    console.log('Page refreshed, clearing logs...');
-    utmManager.clearUTMLog();
-});
 
 // Add to window object
 if (typeof window !== 'undefined') {
