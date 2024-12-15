@@ -15,32 +15,24 @@ class UTMViewer {
         try {
             console.log('Loading filter options');
             const snapshot = await this.utmCollection.get();
-            
-            // Create sets for all filterable fields
             const filters = {
-                adName: new Set(),
-                adSet: new Set(),
+                market: new Set(),
                 brand: new Set(),
-                buyType: new Set(),
                 campaignName: new Set(),
                 channel: new Set(),
                 channelType: new Set(),
                 financialYear: new Set(),
-                market: new Set(),
-                mediaObjective: new Set(),
-                month: new Set(),
-                productCategory: new Set(),
                 quarter: new Set(),
-                subCategory: new Set(),
+                month: new Set(),
                 utmSource: new Set(),
-                utmMedium: new Set()
+                utmMedium: new Set(),
+                productCategory: new Set(),
+                mediaObjective: new Set()
             };
 
             snapshot.forEach(doc => {
                 const data = doc.data();
                 console.log('Processing document for filters:', data);
-
-                // Dynamically add all filter options
                 Object.keys(filters).forEach(filterKey => {
                     if (data[filterKey]) {
                         filters[filterKey].add(data[filterKey]);
@@ -84,11 +76,9 @@ class UTMViewer {
     initializeEventListeners() {
         // Filterable fields
         const filterFields = [
-            'filterAdName', 'filterAdSet', 'filterBrand', 'filterBuyType', 
-            'filterCampaignName', 'filterChannel', 'filterChannelType', 
-            'filterFinancialYear', 'filterMarket', 'filterMediaObjective', 
-            'filterMonth', 'filterProductCategory', 'filterQuarter', 
-            'filterSubCategory', 'filterUtmSource', 'filterUtmMedium'
+            'filterMarket', 'filterBrand', 'filterCampaignName', 'filterChannel',
+            'filterChannelType', 'filterFinancialYear', 'filterQuarter', 'filterMonth',
+            'filterUtmSource', 'filterUtmMedium', 'filterProductCategory', 'filterMediaObjective'
         ];
 
         // Filter change listeners
@@ -108,18 +98,10 @@ class UTMViewer {
                         delete this.filters[filterName];
                     }
                     console.log('Current filters:', this.filters);
+                    this.loadUTMs();
                 });
             }
         });
-
-        // Button listeners
-        const applyButton = document.getElementById('applyFilters');
-        if (applyButton) {
-            applyButton.addEventListener('click', () => {
-                console.log('Applying filters:', this.filters);
-                this.loadUTMs();
-            });
-        }
 
         const clearButton = document.getElementById('clearFilters');
         if (clearButton) {
@@ -136,11 +118,9 @@ class UTMViewer {
 
         // Reset all dropdown selections to first option
         const filterFields = [
-            'filterAdName', 'filterAdSet', 'filterBrand', 'filterBuyType', 
-            'filterCampaignName', 'filterChannel', 'filterChannelType', 
-            'filterFinancialYear', 'filterMarket', 'filterMediaObjective', 
-            'filterMonth', 'filterProductCategory', 'filterQuarter', 
-            'filterSubCategory', 'filterUtmSource', 'filterUtmMedium'
+            'filterMarket', 'filterBrand', 'filterCampaignName', 'filterChannel',
+            'filterChannelType', 'filterFinancialYear', 'filterQuarter', 'filterMonth',
+            'filterUtmSource', 'filterUtmMedium', 'filterProductCategory', 'filterMediaObjective'
         ];
 
         filterFields.forEach(id => {
