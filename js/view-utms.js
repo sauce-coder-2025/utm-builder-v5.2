@@ -3,7 +3,6 @@ class UTMViewer {
         this.db = firebase.firestore();
         this.utmCollection = this.db.collection('utm_strings');
         this.filters = {};
-        this.CONFIG = window.CONFIG;
         this.initializeEventListeners();
         this.loadFilterOptions();
         this.loadUTMs();
@@ -13,94 +12,42 @@ class UTMViewer {
         try {
             const snapshot = await this.utmCollection.get();
             const filters = {
-                // Campaign Organization
                 market: new Set(),
                 brand: new Set(),
-                category: new Set(),
-                subCategory: new Set(),
-                
-                // Campaign Timing
-                financialYear: new Set(),
-                quarter: new Set(),
-                month: new Set(),
-                
-                // Campaign Details
-                source: new Set(),
-                medium: new Set(),
                 channel: new Set(),
-                channelType: new Set(),
-                mediaObjective: new Set(),
-                buyType: new Set()
+                campaign: new Set()
             };
 
             snapshot.forEach(doc => {
                 const data = doc.data();
                 if (data.market) filters.market.add(data.market);
                 if (data.brand) filters.brand.add(data.brand);
-                if (data.category) filters.category.add(data.category);
-                if (data.subCategory) filters.subCategory.add(data.subCategory);
-                if (data.financialYear) filters.financialYear.add(data.financialYear);
-                if (data.quarter) filters.quarter.add(data.quarter);
-                if (data.month) filters.month.add(data.month);
-                if (data.source) filters.source.add(data.source);
-                if (data.medium) filters.medium.add(data.medium);
                 if (data.channel) filters.channel.add(data.channel);
-                if (data.channelType) filters.channelType.add(data.channelType);
-                if (data.mediaObjective) filters.mediaObjective.add(data.mediaObjective);
-                if (data.buyType) filters.buyType.add(data.buyType);
+                if (data.campaignName) filters.campaign.add(data.campaignName);
             });
 
-            // Populate all dropdowns
-            Object.entries(filters).forEach(([key, values]) => {
-                const elementId = 'filter' + key.charAt(0).toUpperCase() + key.slice(1);
-                this.populateDropdown(elementId, Array.from(values));
-            });
+            // Populate dropdowns
+            this.populateDropdown('filterMarket', Array.from(filters.market));
+            this.populateDropdown('filterBrand', Array.from(filters.brand));
+            this.populateDropdown('filterChannel', Array.from(filters.channel));
+            this.populateDropdown('filterCampaign', Array.from(filters.campaign));
 
-            // Set up filter dependencies
-            this.setupFilterDependencies();
         } catch (error) {
             console.error('Error loading filter options:', error);
             Utils.showNotification('Error loading filter options');
         }
     }
 
-        setupFilterDependencies() {
-            // Market-Brand dependency
-            const marketSelect = document.getElementById('filterMarket');
-            if (marketSelect) {
-                marketSelect.addEventListener('change', (e) => {
-                    const market = e.target.value;
-                    const brandSelect = document.getElementById('filterBrand');
-                    if (brandSelect && window.CONFIG && window.CONFIG.marketBrands) {
-                        const availableBrands = market ? window.CONFIG.marketBrands[market] : [];
-                        this.updateDropdownOptions(brandSelect, availableBrands || []);
-                    }
-                });
-            }
-        }
-
-        // Category-SubCategory dependency
-        const categorySelect = document.getElementById('filterCategory');
-        if (categorySelect) {
-            categorySelect.addEventListener('change', (e) => {
-                const category = e.target.value;
-                const subCategorySelect = document.getElementById('filterSubCategory');
-                if (subCategorySelect && this.CONFIG.subCategories) {
-                    const availableSubCategories = category ? this.CONFIG.subCategories[category] : [];
-                    this.updateDropdownOptions(subCategorySelect, availableSubCategories || []);
-                }
-            });
-        }
-
-        // Quarter-Month dependency
-        const quarterSelect = document.getElementById('filterQuarter');
-        if (quarterSelect) {
-            quarterSelect.addEventListener('change', (e) => {
-                const quarter = e.target.value;
-                const monthSelect = document.getElementById('filterMonth');
-                if (monthSelect && this.CONFIG.quarterMonths) {
-                    const availableMonths = quarter ? this.CONFIG.quarterMonths[quarter] : [];
-                    this.updateDropdownOptions(monthSelect, availableMonths || []);
+    setupFilterDependencies() {
+        // Market-Brand dependency
+        const marketSelect = document.getElementById('filterMarket');
+        if (marketSelect) {
+            marketSelect.addEventListener('change', (e) => {
+                const market = e.target.value;
+                const brandSelect = document.getElementById('filterBrand');
+                if (brandSelect && window.CONFIG && window.CONFIG.marketBrands) {
+                    const availableBrands = market ? window.CONFIG.marketBrands[market] : [];
+                    this.updateDropdownOptions(brandSelect, availableBrands || []);
                 }
             });
         }
@@ -135,40 +82,42 @@ class UTMViewer {
             dropdown.appendChild(element);
         });
     }
-    
-        async loadUTMs() {
-            try {
-                let query = this.utmCollection;
-        
-                // Apply filters one by one
-                if (this.filters.market) {
-                    query = query.where('market', '==', this.filters.market);
-                }
-                if (this.filters.brand) {
-                    query = query.where('brand', '==', this.filters.brand);
-                }
-                if (this.filters.channel) {
-                    query = query.where('channel', '==', this.filters.channel);
-                }
-                if (this.filters.campaign) {
-                    query = query.where('campaignName', '==', this.filters.campaign);
-                }
-        
-                // Add orderBy last
-                query = query.orderBy('timestamp', 'desc');
-        
-                const snapshot = await query.get();
-                this.displayUTMs(snapshot);
-            } catch (error) {
-                if (error.code === 'failed-precondition') {
-                    console.error('Index needed:', error);
-                    Utils.showNotification('Database index is being built. Please try again in a few minutes.');
-                } else {
-                    console.error('Error loading UTMs:', error);
-                    Utils.showNotification('Error loading UTMs');
-                }
+
+    async loadUTMs() {
+        try {
+            let query = this.utmCollection;
+
+            // Apply filters one by one
+            if (this.filters.market) {
+                query = query.where('market', '==', this.filters.market);
             }
+            if (this.filters.brand) {
+                query = query.where('brand', '==', this.filters.brand);
+            }
+            if (this.filters.channel) {
+                query = query.where('channel', '==', this.filters.channel);
+            }
+            if (this.filters.campaign) {
+                query = query.where('campaignName', '==', this.filters.campaign);
+            }
+
+            // Add orderBy last
+            query = query.orderBy('timestamp', 'desc');
+
+            const snapshot = await query.get();
+            
+            // Debug log
+            console.log('Documents found:', snapshot.size);
+            snapshot.forEach(doc => {
+                console.log('Document data:', doc.data());
+            });
+
+            this.displayUTMs(snapshot);
+        } catch (error) {
+            console.error('Error loading UTMs:', error);
+            Utils.showNotification('Error loading UTMs');
         }
+    }
 
     displayUTMs(snapshot) {
         const utmLog = document.getElementById('utmLog');
@@ -195,9 +144,9 @@ class UTMViewer {
                     </button>
                 </td>
                 <td>${data.campaignName || ''}</td>
-                <td>${data.source || ''}</td>
-                <td>${data.medium || ''}</td>
-                <td>${data.content || ''}</td>
+                <td>${data.utmSource || ''}</td>
+                <td>${data.utmMedium || ''}</td>
+                <td>${data.utmContent || ''}</td>
                 <td class="utm-url" title="${data.utmString}">${data.utmString}</td>
             `;
             
@@ -206,13 +155,8 @@ class UTMViewer {
     }
 
     initializeEventListeners() {
-        // Set up filter change listeners for all filter dropdowns
-        const filterIds = [
-            'filterMarket', 'filterBrand', 'filterCategory', 'filterSubCategory',
-            'filterFinancialYear', 'filterQuarter', 'filterMonth',
-            'filterSource', 'filterMedium', 'filterChannel', 'filterChannelType',
-            'filterMediaObjective', 'filterBuyType'
-        ];
+        // Set up filter change listeners
+        const filterIds = ['filterMarket', 'filterBrand', 'filterChannel', 'filterCampaign'];
 
         filterIds.forEach(id => {
             const element = document.getElementById(id);
@@ -240,12 +184,7 @@ class UTMViewer {
     clearFilters() {
         this.filters = {};
         
-        const filterIds = [
-            'filterMarket', 'filterBrand', 'filterCategory', 'filterSubCategory',
-            'filterFinancialYear', 'filterQuarter', 'filterMonth',
-            'filterSource', 'filterMedium', 'filterChannel', 'filterChannelType',
-            'filterMediaObjective', 'filterBuyType'
-        ];
+        const filterIds = ['filterMarket', 'filterBrand', 'filterChannel', 'filterCampaign'];
 
         filterIds.forEach(id => {
             const element = document.getElementById(id);
