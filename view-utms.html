@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View UTMs - F&P UTM Builder</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">UTM Builder</a>
+            <div class="navbar-nav">
+                <a class="nav-link" href="index.html">Create UTM</a>
+                <a class="nav-link active" href="view-utms.html">View UTMs</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <!-- Filter Panel -->
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Filter UTMs</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="filterForm">
+                            <div class="mb-3">
+                                <label for="filterMarket" class="form-label">Market</label>
+                                <select class="form-select" id="filterMarket">
+                                    <option value="">All Markets</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="filterBrand" class="form-label">Brand</label>
+                                <select class="form-select" id="filterBrand">
+                                    <option value="">All Brands</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="filterChannel" class="form-label">Channel</label>
+                                <select class="form-select" id="filterChannel">
+                                    <option value="">All Channels</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="filterCampaign" class="form-label">Campaign</label>
+                                <select class="form-select" id="filterCampaign">
+                                    <option value="">All Campaigns</option>
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-primary" id="applyFilters">Apply Filters</button>
+                            <button type="button" class="btn btn-secondary" id="clearFilters">Clear Filters</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UTM Log Panel -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">UTM Log</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Actions</th>
+                                        <th>Campaign</th>
+                                        <th>Source</th>
+                                        <th>Medium</th>
+                                        <th>Content</th>
+                                        <th>UTM URL</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="utmLog">
+                                    <!-- UTM entries will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/view-utms.js"></script>
+</body>
+</html>
