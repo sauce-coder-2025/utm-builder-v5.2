@@ -64,18 +64,19 @@ class UTMViewer {
         }
     }
 
-    setupFilterDependencies() {
-        // Market-Brand dependency
-        const marketSelect = document.getElementById('filterMarket');
-        if (marketSelect) {
-            marketSelect.addEventListener('change', (e) => {
-                const market = e.target.value;
-                const brandSelect = document.getElementById('filterBrand');
-                if (brandSelect && this.CONFIG.marketBrands) {
-                    const availableBrands = market ? this.CONFIG.marketBrands[market] : [];
-                    this.updateDropdownOptions(brandSelect, availableBrands || []);
-                }
-            });
+        setupFilterDependencies() {
+            // Market-Brand dependency
+            const marketSelect = document.getElementById('filterMarket');
+            if (marketSelect) {
+                marketSelect.addEventListener('change', (e) => {
+                    const market = e.target.value;
+                    const brandSelect = document.getElementById('filterBrand');
+                    if (brandSelect && window.CONFIG && window.CONFIG.marketBrands) {
+                        const availableBrands = market ? window.CONFIG.marketBrands[market] : [];
+                        this.updateDropdownOptions(brandSelect, availableBrands || []);
+                    }
+                });
+            }
         }
 
         // Category-SubCategory dependency
@@ -134,34 +135,40 @@ class UTMViewer {
             dropdown.appendChild(element);
         });
     }
-
-async loadUTMs() {
-    try {
-        let query = this.utmCollection.orderBy('timestamp', 'desc');
+    
+        async loadUTMs() {
+            try {
+                let query = this.utmCollection;
         
-        // Debug log
-        console.log('Active filters:', this.filters);
+                // Apply filters one by one
+                if (this.filters.market) {
+                    query = query.where('market', '==', this.filters.market);
+                }
+                if (this.filters.brand) {
+                    query = query.where('brand', '==', this.filters.brand);
+                }
+                if (this.filters.channel) {
+                    query = query.where('channel', '==', this.filters.channel);
+                }
+                if (this.filters.campaign) {
+                    query = query.where('campaignName', '==', this.filters.campaign);
+                }
         
-        Object.entries(this.filters).forEach(([field, value]) => {
-            if (value) {
-                console.log(`Applying filter: ${field} = ${value}`);
-                query = query.where(field, '==', value);
+                // Add orderBy last
+                query = query.orderBy('timestamp', 'desc');
+        
+                const snapshot = await query.get();
+                this.displayUTMs(snapshot);
+            } catch (error) {
+                if (error.code === 'failed-precondition') {
+                    console.error('Index needed:', error);
+                    Utils.showNotification('Database index is being built. Please try again in a few minutes.');
+                } else {
+                    console.error('Error loading UTMs:', error);
+                    Utils.showNotification('Error loading UTMs');
+                }
             }
-        });
-
-        const snapshot = await query.get();
-        
-        // Debug log
-        snapshot.forEach(doc => {
-            console.log('Document data:', doc.data());
-        });
-        
-        this.displayUTMs(snapshot);
-    } catch (error) {
-        console.error('Error loading UTMs:', error);
-        Utils.showNotification('Error loading UTMs');
-    }
-}
+        }
 
     displayUTMs(snapshot) {
         const utmLog = document.getElementById('utmLog');
