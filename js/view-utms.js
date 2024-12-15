@@ -101,6 +101,7 @@ class UTMViewer {
                     }
                     console.log('Current filters:', this.filters);
                     this.updateFilterOptions();
+                    this.populateFilterDropdowns();
                     this.loadUTMs();
                 });
             }
@@ -119,9 +120,11 @@ class UTMViewer {
         // Update filter options based on current filters
         const updatedOptions = { ...this.filterOptions };
         
-        // Reset all filter options except the one being updated
+        // Reset filter options that are not being used as filters
         Object.keys(updatedOptions).forEach(filterKey => {
-            updatedOptions[filterKey] = new Set();
+            if (!this.filters[filterKey]) {
+                updatedOptions[filterKey] = new Set();
+            }
         });
         
         // Query the collection to update the filter options
@@ -141,7 +144,8 @@ class UTMViewer {
                 });
             });
             
-            // Update the filterOptions object
+            console.log('Updated filter options:', updatedOptions);
+            console.log('Filters applied:', this.filters);
             this.filterOptions = updatedOptions;
             this.populateFilterDropdowns();
         });
@@ -150,21 +154,7 @@ class UTMViewer {
     clearFilters() {
         // Reset filters object
         this.filters = {};
-
-        // Reset all dropdown selections to first option
-        const filterFields = [
-            'filterMarket', 'filterBrand', 'filterCampaignName', 'filterChannel',
-            'filterChannelType', 'filterFinancialYear', 'filterQuarter', 'filterMonth',
-            'filterUtmSource', 'filterUtmMedium', 'filterProductCategory', 'filterMediaObjective'
-        ];
-
-        filterFields.forEach(id => {
-            const element = document.getElementById(id);
-            if (element) element.selectedIndex = 0;
-        });
-
-        // Reload filter options and UTMs without filters
-        this.loadFilterOptions();
+        this.loadFilterOptions(); // Ensure reloading happens after clear
         this.loadUTMs();
     }
 
