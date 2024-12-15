@@ -3,7 +3,7 @@ class UTMViewer {
         this.db = firebase.firestore();
         this.utmCollection = this.db.collection('utm_strings');
         this.filters = {};
-        this.CONFIG = window.CONFIG; // Access your CONFIG object
+        this.CONFIG = window.CONFIG;
         this.initializeEventListeners();
         this.loadFilterOptions();
         this.loadUTMs();
@@ -13,22 +13,28 @@ class UTMViewer {
         try {
             const snapshot = await this.utmCollection.get();
             const filters = {
+                // Campaign Organization
                 market: new Set(),
                 brand: new Set(),
                 category: new Set(),
                 subCategory: new Set(),
+                
+                // Campaign Timing
                 financialYear: new Set(),
                 quarter: new Set(),
                 month: new Set(),
+                
+                // Campaign Details
                 source: new Set(),
                 medium: new Set(),
+                channel: new Set(),
+                channelType: new Set(),
                 mediaObjective: new Set(),
                 buyType: new Set()
             };
 
             snapshot.forEach(doc => {
                 const data = doc.data();
-                // Populate filter sets with data
                 if (data.market) filters.market.add(data.market);
                 if (data.brand) filters.brand.add(data.brand);
                 if (data.category) filters.category.add(data.category);
@@ -36,26 +42,21 @@ class UTMViewer {
                 if (data.financialYear) filters.financialYear.add(data.financialYear);
                 if (data.quarter) filters.quarter.add(data.quarter);
                 if (data.month) filters.month.add(data.month);
-                if (data.utmSource) filters.source.add(data.utmSource);
-                if (data.utmMedium) filters.medium.add(data.utmMedium);
+                if (data.source) filters.source.add(data.source);
+                if (data.medium) filters.medium.add(data.medium);
+                if (data.channel) filters.channel.add(data.channel);
+                if (data.channelType) filters.channelType.add(data.channelType);
                 if (data.mediaObjective) filters.mediaObjective.add(data.mediaObjective);
                 if (data.buyType) filters.buyType.add(data.buyType);
             });
 
-            // Populate dropdowns
-            this.populateDropdown('filterMarket', Array.from(filters.market));
-            this.populateDropdown('filterBrand', Array.from(filters.brand));
-            this.populateDropdown('filterCategory', Array.from(filters.category));
-            this.populateDropdown('filterSubCategory', Array.from(filters.subCategory));
-            this.populateDropdown('filterFinancialYear', Array.from(filters.financialYear));
-            this.populateDropdown('filterQuarter', Array.from(filters.quarter));
-            this.populateDropdown('filterMonth', Array.from(filters.month));
-            this.populateDropdown('filterSource', Array.from(filters.source));
-            this.populateDropdown('filterMedium', Array.from(filters.medium));
-            this.populateDropdown('filterMediaObjective', Array.from(filters.mediaObjective));
-            this.populateDropdown('filterBuyType', Array.from(filters.buyType));
+            // Populate all dropdowns
+            Object.entries(filters).forEach(([key, values]) => {
+                const elementId = 'filter' + key.charAt(0).toUpperCase() + key.slice(1);
+                this.populateDropdown(elementId, Array.from(values));
+            });
 
-            // Set up dependencies
+            // Set up filter dependencies
             this.setupFilterDependencies();
         } catch (error) {
             console.error('Error loading filter options:', error);
@@ -65,34 +66,43 @@ class UTMViewer {
 
     setupFilterDependencies() {
         // Market-Brand dependency
-        document.getElementById('filterMarket')?.addEventListener('change', (e) => {
-            const market = e.target.value;
-            const brandSelect = document.getElementById('filterBrand');
-            if (brandSelect) {
-                const availableBrands = market ? this.CONFIG.marketBrands[market] || [] : [];
-                this.updateDropdownOptions(brandSelect, availableBrands);
-            }
-        });
+        const marketSelect = document.getElementById('filterMarket');
+        if (marketSelect) {
+            marketSelect.addEventListener('change', (e) => {
+                const market = e.target.value;
+                const brandSelect = document.getElementById('filterBrand');
+                if (brandSelect && this.CONFIG.marketBrands) {
+                    const availableBrands = market ? this.CONFIG.marketBrands[market] : [];
+                    this.updateDropdownOptions(brandSelect, availableBrands || []);
+                }
+            });
+        }
 
         // Category-SubCategory dependency
-        document.getElementById('filterCategory')?.addEventListener('change', (e) => {
-            const category = e.target.value;
-            const subCategorySelect = document.getElementById('filterSubCategory');
-            if (subCategorySelect) {
-                const availableSubCategories = category ? this.CONFIG.subCategories[category] || [] : [];
-                this.updateDropdownOptions(subCategorySelect, availableSubCategories);
-            }
-        });
+        const categorySelect = document.getElementById('filterCategory');
+        if (categorySelect) {
+            categorySelect.addEventListener('change', (e) => {
+                const category = e.target.value;
+                const subCategorySelect = document.getElementById('filterSubCategory');
+                if (subCategorySelect && this.CONFIG.subCategories) {
+                    const availableSubCategories = category ? this.CONFIG.subCategories[category] : [];
+                    this.updateDropdownOptions(subCategorySelect, availableSubCategories || []);
+                }
+            });
+        }
 
         // Quarter-Month dependency
-        document.getElementById('filterQuarter')?.addEventListener('change', (e) => {
-            const quarter = e.target.value;
-            const monthSelect = document.getElementById('filterMonth');
-            if (monthSelect) {
-                const availableMonths = quarter ? this.CONFIG.quarterMonths[quarter] || [] : [];
-                this.updateDropdownOptions(monthSelect, availableMonths);
-            }
-        });
+        const quarterSelect = document.getElementById('filterQuarter');
+        if (quarterSelect) {
+            quarterSelect.addEventListener('change', (e) => {
+                const quarter = e.target.value;
+                const monthSelect = document.getElementById('filterMonth');
+                if (monthSelect && this.CONFIG.quarterMonths) {
+                    const availableMonths = quarter ? this.CONFIG.quarterMonths[quarter] : [];
+                    this.updateDropdownOptions(monthSelect, availableMonths || []);
+                }
+            });
+        }
     }
 
     updateDropdownOptions(select, options) {
@@ -129,24 +139,10 @@ class UTMViewer {
         try {
             let query = this.utmCollection.orderBy('timestamp', 'desc');
 
-            // Apply all filters
+            // Apply all active filters
             Object.entries(this.filters).forEach(([field, value]) => {
                 if (value) {
-                    // Map filter fields to database fields
-                    let dbField = field;
-                    switch(field) {
-                        case 'source':
-                            dbField = 'utmSource';
-                            break;
-                        case 'medium':
-                            dbField = 'utmMedium';
-                            break;
-                        case 'campaign':
-                            dbField = 'utmCampaign';
-                            break;
-                        // Add other field mappings as needed
-                    }
-                    query = query.where(dbField, '==', value);
+                    query = query.where(field, '==', value);
                 }
             });
 
@@ -164,6 +160,11 @@ class UTMViewer {
 
         utmLog.innerHTML = '';
 
+        if (snapshot.empty) {
+            utmLog.innerHTML = '<tr><td colspan="6" class="text-center">No UTMs found matching the selected filters</td></tr>';
+            return;
+        }
+
         snapshot.forEach(doc => {
             const data = doc.data();
             const row = document.createElement('tr');
@@ -177,10 +178,10 @@ class UTMViewer {
                         🧪
                     </button>
                 </td>
-                <td>${data.utmCampaign || ''}</td>
-                <td>${data.utmSource || ''}</td>
-                <td>${data.utmMedium || ''}</td>
-                <td>${data.utmContent || ''}</td>
+                <td>${data.campaignName || ''}</td>
+                <td>${data.source || ''}</td>
+                <td>${data.medium || ''}</td>
+                <td>${data.content || ''}</td>
                 <td class="utm-url" title="${data.utmString}">${data.utmString}</td>
             `;
             
@@ -189,30 +190,35 @@ class UTMViewer {
     }
 
     initializeEventListeners() {
-        // Set up filter change listeners
+        // Set up filter change listeners for all filter dropdowns
         const filterIds = [
             'filterMarket', 'filterBrand', 'filterCategory', 'filterSubCategory',
             'filterFinancialYear', 'filterQuarter', 'filterMonth',
-            'filterSource', 'filterMedium', 'filterMediaObjective', 'filterBuyType'
+            'filterSource', 'filterMedium', 'filterChannel', 'filterChannelType',
+            'filterMediaObjective', 'filterBuyType'
         ];
 
         filterIds.forEach(id => {
-            document.getElementById(id)?.addEventListener('change', (e) => {
-                // Remove 'filter' prefix and convert to camelCase
-                const filterName = id.replace('filter', '').charAt(0).toLowerCase() + 
-                                 id.replace('filter', '').slice(1);
-                this.filters[filterName] = e.target.value;
-            });
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('change', (e) => {
+                    const filterName = id.replace('filter', '').charAt(0).toLowerCase() + 
+                                     id.replace('filter', '').slice(1);
+                    this.filters[filterName] = e.target.value;
+                });
+            }
         });
 
         // Button listeners
-        document.getElementById('applyFilters')?.addEventListener('click', () => {
-            this.loadUTMs();
-        });
+        const applyFiltersBtn = document.getElementById('applyFilters');
+        if (applyFiltersBtn) {
+            applyFiltersBtn.addEventListener('click', () => this.loadUTMs());
+        }
 
-        document.getElementById('clearFilters')?.addEventListener('click', () => {
-            this.clearFilters();
-        });
+        const clearFiltersBtn = document.getElementById('clearFilters');
+        if (clearFiltersBtn) {
+            clearFiltersBtn.addEventListener('click', () => this.clearFilters());
+        }
     }
 
     clearFilters() {
@@ -221,12 +227,15 @@ class UTMViewer {
         const filterIds = [
             'filterMarket', 'filterBrand', 'filterCategory', 'filterSubCategory',
             'filterFinancialYear', 'filterQuarter', 'filterMonth',
-            'filterSource', 'filterMedium', 'filterMediaObjective', 'filterBuyType'
+            'filterSource', 'filterMedium', 'filterChannel', 'filterChannelType',
+            'filterMediaObjective', 'filterBuyType'
         ];
 
         filterIds.forEach(id => {
             const element = document.getElementById(id);
-            if (element) element.selectedIndex = 0;
+            if (element) {
+                element.selectedIndex = 0;
+            }
         });
 
         this.loadUTMs();
