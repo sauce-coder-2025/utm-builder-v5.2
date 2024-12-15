@@ -120,20 +120,19 @@ class UTMViewer {
         const updatedOptions = { ...this.filterOptions };
         Object.keys(this.filters).forEach(filterKey => {
             const filteredValues = new Set();
-            this.utmCollection.get().then(snapshot => {
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    if (data[filterKey] === this.filters[filterKey]) {
+            this.utmCollection.where(filterKey, '==', this.filters[filterKey]).get()
+                .then(snapshot => {
+                    snapshot.forEach(doc => {
+                        const data = doc.data();
                         Object.keys(updatedOptions).forEach(optionKey => {
                             if (data[optionKey]) {
                                 filteredValues.add(data[optionKey]);
                             }
                         });
-                    }
+                    });
+                    updatedOptions[filterKey] = filteredValues;
+                    this.populateFilterDropdowns();
                 });
-                updatedOptions[filterKey] = filteredValues;
-                this.populateFilterDropdowns();
-            });
         });
         this.filterOptions = updatedOptions;
     }
