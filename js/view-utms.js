@@ -1,3 +1,17 @@
+console.log('View UTMs script loaded');
+
+class UTMViewer {
+    constructor() {
+        console.log('UTM Viewer initializing');
+        this.db = firebase.firestore();
+        this.utmCollection = this.db.collection('utm_strings');
+        this.filters = {};
+        this.initializeEventListeners();
+        this.loadFilterOptions();
+        this.loadUTMs();
+    }
+    // ... rest of the code
+
 class UTMViewer {
     constructor() {
         this.db = firebase.firestore();
