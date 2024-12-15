@@ -135,24 +135,33 @@ class UTMViewer {
         });
     }
 
-    async loadUTMs() {
-        try {
-            let query = this.utmCollection.orderBy('timestamp', 'desc');
+async loadUTMs() {
+    try {
+        let query = this.utmCollection.orderBy('timestamp', 'desc');
+        
+        // Debug log
+        console.log('Active filters:', this.filters);
+        
+        Object.entries(this.filters).forEach(([field, value]) => {
+            if (value) {
+                console.log(`Applying filter: ${field} = ${value}`);
+                query = query.where(field, '==', value);
+            }
+        });
 
-            // Apply all active filters
-            Object.entries(this.filters).forEach(([field, value]) => {
-                if (value) {
-                    query = query.where(field, '==', value);
-                }
-            });
-
-            const snapshot = await query.get();
-            this.displayUTMs(snapshot);
-        } catch (error) {
-            console.error('Error loading UTMs:', error);
-            Utils.showNotification('Error loading UTMs');
-        }
+        const snapshot = await query.get();
+        
+        // Debug log
+        snapshot.forEach(doc => {
+            console.log('Document data:', doc.data());
+        });
+        
+        this.displayUTMs(snapshot);
+    } catch (error) {
+        console.error('Error loading UTMs:', error);
+        Utils.showNotification('Error loading UTMs');
     }
+}
 
     displayUTMs(snapshot) {
         const utmLog = document.getElementById('utmLog');
