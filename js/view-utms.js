@@ -118,23 +118,33 @@ class UTMViewer {
     updateFilterOptions() {
         // Update filter options based on current filters
         const updatedOptions = { ...this.filterOptions };
-        Object.keys(this.filters).forEach(filterKey => {
-            const filteredValues = new Set();
-            this.utmCollection.where(filterKey, '==', this.filters[filterKey]).get()
-                .then(snapshot => {
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
+        
+        // Reset all filter options except the one being updated
+        Object.keys(updatedOptions).forEach(filterKey => {
+            updatedOptions[filterKey] = new Set();
+        });
+        
+        // Query the collection to update the filter options
+        this.utmCollection.get().then(snapshot => {
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                
+                // Update the filter options based on the current filters
+                Object.keys(this.filters).forEach(filterKey => {
+                    if (data[filterKey] === this.filters[filterKey]) {
                         Object.keys(updatedOptions).forEach(optionKey => {
                             if (data[optionKey]) {
-                                filteredValues.add(data[optionKey]);
+                                updatedOptions[optionKey].add(data[optionKey]);
                             }
                         });
-                    });
-                    updatedOptions[filterKey] = filteredValues;
-                    this.populateFilterDropdowns();
+                    }
                 });
+            });
+            
+            // Update the filterOptions object
+            this.filterOptions = updatedOptions;
+            this.populateFilterDropdowns();
         });
-        this.filterOptions = updatedOptions;
     }
 
     clearFilters() {
