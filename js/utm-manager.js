@@ -1,6 +1,7 @@
 class UTMManager {
     constructor() {
-        this.utmLogData = [];
+        // Initialize Firebase reference
+        this.utmCollection = firebase.firestore().collection('utm_strings');
     }
 
     generateUTM() {
@@ -60,12 +61,12 @@ class UTMManager {
         }
     }
 
-    saveUTM() {
+    async saveUTM() {
         console.log('Saving UTM');
         const formData = FormManager.getFormData();
         
         // Add metadata
-        formData.timestamp = new Date().toLocaleString();
+        formData.timestamp = new Date().toISOString();
         
         // Add UTM parameters
         formData.utmSource = document.getElementById('utmSource').value;
@@ -80,19 +81,28 @@ class UTMManager {
             return;
         }
 
-        // Check for duplicates
-        if (this.utmLogData.some(data => data.utmString === formData.utmString)) {
-            Utils.showNotification('This UTM has already been saved');
-            return;
+        try {
+            // Check for duplicates in Firebase
+            const querySnapshot = await this.utmCollection
+                .where('utmString', '==', formData.utmString)
+                .get();
+
+            if (!querySnapshot.empty) {
+                Utils.showNotification('This UTM has already been saved');
+                return;
+            }
+
+            // Save to Firebase
+            await this.utmCollection.add(formData);
+
+            // Update the UI
+            this.addUTMToLog(formData);
+            
+            Utils.showNotification('UTM saved successfully');
+        } catch (error) {
+            console.error('Error saving UTM:', error);
+            Utils.showNotification('Error saving UTM');
         }
-
-        // Add to log data
-        this.utmLogData.push(formData);
-
-        // Update the UI
-        this.addUTMToLog(formData);
-        
-        Utils.showNotification('UTM saved successfully');
     }
 
     addUTMToLog(formData) {
@@ -141,39 +151,58 @@ class UTMManager {
         window.open(utmString, '_blank');
     }
 
-    deleteUTM(button) {
+    async deleteUTM(button) {
         console.log('Deleting UTM');
         const row = button.closest('tr');
         const utmString = row.querySelector('.utm-url').title;
         
-        // Remove from data array
-        this.utmLogData = this.utmLogData.filter(data => data.utmString !== utmString);
-        
-        // Remove from UI
-        row.remove();
-        
-        Utils.showNotification('UTM deleted successfully');
+        try {
+            // Find and delete from Firebase
+            const querySnapshot = await this.utmCollection
+                .where('utmString', '==', utmString)
+                .get();
+
+            querySnapshot.forEach(async (doc) => {
+                await doc.ref.delete();
+            });
+            
+            // Remove from UI
+            row.remove();
+            
+            Utils.showNotification('UTM deleted successfully');
+        } catch (error) {
+            console.error('Error deleting UTM:', error);
+            Utils.showNotification('Error deleting UTM');
+        }
     }
 
-    completeSession() {
+    async loadSavedUTMs() {
+        try {
+            const querySnapshot = await this.utmCollection
+                .orderBy('timestamp', 'desc')
+                .get();
+
+            querySnapshot.forEach((doc) => {
+                const formData = doc.data();
+                this.addUTMToLog(formData);
+            });
+        } catch (error) {
+            console.error('Error loading UTMs:', error);
+            Utils.showNotification('Error loading saved UTMs');
+        }
+    }
+
+    async completeSession() {
         console.log('Completing UTM session');
         const endSaveButton = document.getElementById('endSaveButton');
         const endSaveSpinner = document.getElementById('endSaveSpinner');
-
-        if (this.utmLogData.length === 0) {
-            Utils.showNotification('No UTMs to save. Please generate and save at least one UTM before completing the session.');
-            return;
-        }
 
         if (endSaveSpinner) {
             endSaveSpinner.style.display = 'inline-block';
         }
 
         try {
-            // Here you would typically make an API call to save the session
-            // For now, we'll just clear the form
             Utils.clearForm();
-            this.utmLogData = [];
             document.getElementById('utmLog').innerHTML = '';
             Utils.showNotification('Session completed successfully');
         } catch (error) {
@@ -189,6 +218,11 @@ class UTMManager {
 
 // Initialize UTM Manager
 const utmManager = new UTMManager();
+
+// Load saved UTMs when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    utmManager.loadSavedUTMs();
+});
 
 // Add to window object
 if (typeof window !== 'undefined') {
