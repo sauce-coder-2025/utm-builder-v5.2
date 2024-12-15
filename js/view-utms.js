@@ -132,29 +132,37 @@ class UTMViewer {
         this.loadUTMs();
     }
 
-    async loadUTMs() {
-        try {
-            console.log('Loading UTMs with filters:', this.filters);
-            let query = this.utmCollection;
-
-            // Dynamically apply filters based on current filter state
-            Object.keys(this.filters).forEach(filterKey => {
-                console.log(`Applying filter: ${filterKey} = ${this.filters[filterKey]}`);
-                query = query.where(filterKey, '==', this.filters[filterKey]);
-            });
-
-            // Always order by timestamp
-            query = query.orderBy('timestamp', 'desc');
-
-            const snapshot = await query.get();
-            console.log('Filtered documents found:', snapshot.size);
-            this.displayUTMs(snapshot);
-        } catch (error) {
-            console.error('Error loading UTMs:', error);
-            // Show error notification to user
-            this.showNotification('Error loading UTMs: ' + error.message);
+        async loadUTMs() {
+            try {
+                console.log('Loading UTMs with filters:', this.filters);
+                let query = this.utmCollection;
+        
+                // Dynamically apply filters based on current filter state
+                Object.keys(this.filters).forEach(filterKey => {
+                    console.log(`Applying filter: ${filterKey} = ${this.filters[filterKey]}`);
+                    query = query.where(filterKey, '==', this.filters[filterKey]);
+                });
+        
+                // Always order by timestamp
+                query = query.orderBy('timestamp', 'desc');
+        
+                const snapshot = await query.get();
+                console.log('Filtered documents found:', snapshot.size);
+                this.displayUTMs(snapshot);
+            } catch (error) {
+                console.error('Error loading UTMs:', error);
+        
+                // Check if the error is due to missing index
+                if (error.code === 'permission-denied' && error.message.includes('requires an index')) {
+                    // Show a more user-friendly error message
+                    this.showNotification('The query requires an index. Please create the index in the Firebase console.');
+                    console.log('Index creation instructions:', error.message);
+                } else {
+                    // Show a generic error message
+                    this.showNotification('Error loading UTMs: ' + error.message);
+                }
+            }
         }
-    }
 
     displayUTMs(snapshot) {
         const utmLog = document.getElementById('utmLog');
