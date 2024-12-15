@@ -7,6 +7,9 @@ const firebaseConfig = {
       appId: "1:989778167843:web:96555b3ed1149a7a6dc996",
       measurementId: "G-DZ6MCDJVDY"
     };
+
+firebase.initializeApp(firebaseConfig);
+
 const CONFIG = {
     // Market-Brand dependencies
     marketBrands: {
