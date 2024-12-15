@@ -105,39 +105,39 @@ class UTMManager {
         }
     }
 
-    addUTMToLog(formData) {
-        console.log('Adding UTM to log');
-        const utmLog = document.getElementById('utmLog');
-        
-        if (!utmLog) {
-            console.error('UTM log element not found');
-            return;
-        }
-
-        const newRow = document.createElement('tr');
-        
-        newRow.innerHTML = `
-            <td class="utm-actions">
-                <button class="btn btn-sm btn-outline-primary me-2 small-btn" onclick="utmManager.copyUTM(this)" title="Copy UTM">
-                    <i class="bi bi-clipboard"></i>
-                </button>
-                <button class="btn btn-sm btn-outline-warning me-2 small-btn" onclick="utmManager.testUTM(this)" title="Test UTM">
-                    🧪
-                </button>
-                <button class="btn btn-sm btn-outline-danger small-btn" onclick="utmManager.deleteUTM(this)" title="Delete UTM">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </td>
-            <td>${formData.utmCampaign}</td>
-            <td>${formData.utmSource}</td>
-            <td>${formData.utmMedium}</td>
-            <td>${formData.utmContent}</td>
-            <td class="utm-url" title="${formData.utmString}">${formData.utmString}</td>
-        `;
-        
-        utmLog.appendChild(newRow);
-        utmLog.parentElement.scrollTop = utmLog.parentElement.scrollHeight;
+addUTMToLog(formData) {
+    console.log('Adding UTM to log');
+    const utmLog = document.getElementById('utmLog');
+    
+    if (!utmLog) {
+        console.error('UTM log element not found');
+        return;
     }
+
+    const newRow = document.createElement('tr');
+    
+    newRow.innerHTML = `
+        <td class="utm-actions d-flex">
+            <button class="btn btn-sm btn-outline-primary me-2" onclick="utmManager.copyUTM(this)" title="Copy UTM">
+                <i class="bi bi-clipboard"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-warning me-2" onclick="utmManager.testUTM(this)" title="Test UTM">
+                🧪
+            </button>
+            <button class="btn btn-sm btn-outline-danger" onclick="utmManager.deleteUTM(this)" title="Delete UTM">
+                <i class="bi bi-trash"></i>
+            </button>
+        </td>
+        <td>${formData.utmCampaign}</td>
+        <td>${formData.utmSource}</td>
+        <td>${formData.utmMedium}</td>
+        <td>${formData.utmContent}</td>
+        <td class="utm-url" title="${formData.utmString}">${formData.utmString}</td>
+    `;
+    
+    utmLog.appendChild(newRow);
+    utmLog.parentElement.scrollTop = utmLog.parentElement.scrollHeight;
+}
 
     copyUTM(button) {
         console.log('Copying UTM');
