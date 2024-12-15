@@ -2,7 +2,7 @@ class UTMViewer {
     constructor() {
         this.db = firebase.firestore();
         this.utmCollection = this.db.collection('utm_strings');
-        this.currentFilters = {};
+        this.filters = {};
         this.initializeEventListeners();
         this.loadFilterOptions();
         this.loadUTMs();
@@ -38,7 +38,7 @@ class UTMViewer {
         const dropdown = document.getElementById(elementId);
         if (!dropdown) return;
 
-        // Clear existing options except the first one (All...)
+        // Keep the first option (All...)
         const firstOption = dropdown.options[0];
         dropdown.innerHTML = '';
         dropdown.appendChild(firstOption);
@@ -57,11 +57,11 @@ class UTMViewer {
             let query = this.utmCollection.orderBy('timestamp', 'desc');
 
             // Apply filters
-            for (const [field, value] of Object.entries(this.currentFilters)) {
+            Object.entries(this.filters).forEach(([field, value]) => {
                 if (value) {
                     query = query.where(field, '==', value);
                 }
-            }
+            });
 
             const snapshot = await query.get();
             this.displayUTMs(snapshot);
@@ -90,7 +90,7 @@ class UTMViewer {
                         🧪
                     </button>
                 </td>
-                <td>${data.campaignName || ''}</td>
+                <td>${data.utmCampaign || ''}</td>
                 <td>${data.utmSource || ''}</td>
                 <td>${data.utmMedium || ''}</td>
                 <td>${data.utmContent || ''}</td>
@@ -102,24 +102,12 @@ class UTMViewer {
     }
 
     initializeEventListeners() {
-        // Filter change listeners
-        document.getElementById('filterMarket')?.addEventListener('change', e => {
-            this.currentFilters.market = e.target.value;
+        ['filterMarket', 'filterBrand', 'filterChannel', 'filterCampaign'].forEach(id => {
+            document.getElementById(id)?.addEventListener('change', (e) => {
+                this.filters[id.replace('filter', '').toLowerCase()] = e.target.value;
+            });
         });
 
-        document.getElementById('filterBrand')?.addEventListener('change', e => {
-            this.currentFilters.brand = e.target.value;
-        });
-
-        document.getElementById('filterChannel')?.addEventListener('change', e => {
-            this.currentFilters.channel = e.target.value;
-        });
-
-        document.getElementById('filterCampaign')?.addEventListener('change', e => {
-            this.currentFilters.campaignName = e.target.value;
-        });
-
-        // Button listeners
         document.getElementById('applyFilters')?.addEventListener('click', () => {
             this.loadUTMs();
         });
@@ -130,9 +118,8 @@ class UTMViewer {
     }
 
     clearFilters() {
-        this.currentFilters = {};
+        this.filters = {};
         
-        // Reset all dropdowns
         ['filterMarket', 'filterBrand', 'filterChannel', 'filterCampaign'].forEach(id => {
             const element = document.getElementById(id);
             if (element) element.selectedIndex = 0;
