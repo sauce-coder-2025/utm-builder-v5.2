@@ -15,31 +15,49 @@ class UTMViewer {
         try {
             console.log('Loading filter options');
             const snapshot = await this.utmCollection.get();
+            
+            // Create sets for all filterable fields
             const filters = {
-                market: new Set(),
+                adName: new Set(),
+                adSet: new Set(),
                 brand: new Set(),
+                buyType: new Set(),
+                campaignName: new Set(),
                 channel: new Set(),
-                campaignName: new Set()
+                channelType: new Set(),
+                financialYear: new Set(),
+                market: new Set(),
+                mediaObjective: new Set(),
+                month: new Set(),
+                productCategory: new Set(),
+                quarter: new Set(),
+                subCategory: new Set(),
+                utmSource: new Set(),
+                utmMedium: new Set()
             };
 
             snapshot.forEach(doc => {
                 const data = doc.data();
                 console.log('Processing document for filters:', data);
-                if (data.market) filters.market.add(data.market);
-                if (data.brand) filters.brand.add(data.brand);
-                if (data.channel) filters.channel.add(data.channel);
-                if (data.campaignName) filters.campaignName.add(data.campaignName);
+
+                // Dynamically add all filter options
+                Object.keys(filters).forEach(filterKey => {
+                    if (data[filterKey]) {
+                        filters[filterKey].add(data[filterKey]);
+                    }
+                });
             });
 
             console.log('Populated filters:', filters);
 
-            // Populate dropdowns
-            this.populateDropdown('filterMarket', Array.from(filters.market));
-            this.populateDropdown('filterBrand', Array.from(filters.brand));
-            this.populateDropdown('filterChannel', Array.from(filters.channel));
-            this.populateDropdown('filterCampaign', Array.from(filters.campaignName));
+            // Populate dropdowns dynamically
+            Object.keys(filters).forEach(filterKey => {
+                const dropdownId = `filter${filterKey.charAt(0).toUpperCase() + filterKey.slice(1)}`;
+                this.populateDropdown(dropdownId, Array.from(filters[filterKey]));
+            });
         } catch (error) {
             console.error('Error loading filter options:', error);
+            this.showNotification('Error loading filter options: ' + error.message);
         }
     }
 
@@ -64,15 +82,32 @@ class UTMViewer {
     }
 
     initializeEventListeners() {
+        // Filterable fields
+        const filterFields = [
+            'filterAdName', 'filterAdSet', 'filterBrand', 'filterBuyType', 
+            'filterCampaignName', 'filterChannel', 'filterChannelType', 
+            'filterFinancialYear', 'filterMarket', 'filterMediaObjective', 
+            'filterMonth', 'filterProductCategory', 'filterQuarter', 
+            'filterSubCategory', 'filterUtmSource', 'filterUtmMedium'
+        ];
+
         // Filter change listeners
-        ['filterMarket', 'filterBrand', 'filterChannel', 'filterCampaign'].forEach(id => {
+        filterFields.forEach(id => {
             const element = document.getElementById(id);
             if (element) {
                 element.addEventListener('change', (e) => {
+                    // Convert dropdown ID to filter key (e.g., 'filterBrand' -> 'brand')
                     const filterName = id.replace('filter', '').charAt(0).toLowerCase() + 
                                      id.replace('filter', '').slice(1);
-                    this.filters[filterName] = e.target.value;
-                    console.log('Filter updated:', filterName, e.target.value);
+                    
+                    // Only set filter if a value is selected
+                    if (e.target.value) {
+                        this.filters[filterName] = e.target.value;
+                    } else {
+                        // Remove the filter if no value is selected
+                        delete this.filters[filterName];
+                    }
+                    console.log('Current filters:', this.filters);
                 });
             }
         });
@@ -96,11 +131,24 @@ class UTMViewer {
     }
 
     clearFilters() {
+        // Reset filters object
         this.filters = {};
-        ['filterMarket', 'filterBrand', 'filterChannel', 'filterCampaign'].forEach(id => {
+
+        // Reset all dropdown selections to first option
+        const filterFields = [
+            'filterAdName', 'filterAdSet', 'filterBrand', 'filterBuyType', 
+            'filterCampaignName', 'filterChannel', 'filterChannelType', 
+            'filterFinancialYear', 'filterMarket', 'filterMediaObjective', 
+            'filterMonth', 'filterProductCategory', 'filterQuarter', 
+            'filterSubCategory', 'filterUtmSource', 'filterUtmMedium'
+        ];
+
+        filterFields.forEach(id => {
             const element = document.getElementById(id);
             if (element) element.selectedIndex = 0;
         });
+
+        // Reload UTMs without filters
         this.loadUTMs();
     }
 
@@ -109,28 +157,22 @@ class UTMViewer {
             console.log('Loading UTMs with filters:', this.filters);
             let query = this.utmCollection;
 
-            // Apply filters
-            if (this.filters.market) {
-                query = query.where('market', '==', this.filters.market);
-            }
-            if (this.filters.brand) {
-                query = query.where('brand', '==', this.filters.brand);
-            }
-            if (this.filters.channel) {
-                query = query.where('channel', '==', this.filters.channel);
-            }
-            if (this.filters.campaignName) {
-                query = query.where('campaignName', '==', this.filters.campaignName);
-            }
+            // Dynamically apply filters based on current filter state
+            Object.keys(this.filters).forEach(filterKey => {
+                console.log(`Applying filter: ${filterKey} = ${this.filters[filterKey]}`);
+                query = query.where(filterKey, '==', this.filters[filterKey]);
+            });
 
-            // Add orderBy last
+            // Always order by timestamp
             query = query.orderBy('timestamp', 'desc');
 
             const snapshot = await query.get();
-            console.log('Documents found:', snapshot.size);
+            console.log('Filtered documents found:', snapshot.size);
             this.displayUTMs(snapshot);
         } catch (error) {
             console.error('Error loading UTMs:', error);
+            // Show error notification to user
+            this.showNotification('Error loading UTMs: ' + error.message);
         }
     }
 
@@ -175,12 +217,33 @@ class UTMViewer {
 
     copyUTM(utmString) {
         navigator.clipboard.writeText(utmString)
-            .then(() => console.log('UTM copied'))
-            .catch(err => console.error('Copy failed', err));
+            .then(() => {
+                console.log('UTM copied');
+                this.showNotification('UTM copied to clipboard');
+            })
+            .catch(err => {
+                console.error('Copy failed', err);
+                this.showNotification('Failed to copy UTM');
+            });
     }
 
     testUTM(utmString) {
         window.open(utmString, '_blank');
+    }
+
+    showNotification(message) {
+        const notification = document.getElementById('notification');
+        const notificationMessage = document.getElementById('notification-message');
+        
+        if (notification && notificationMessage) {
+            notificationMessage.textContent = message;
+            notification.style.display = 'block';
+
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000);
+        }
     }
 }
 
