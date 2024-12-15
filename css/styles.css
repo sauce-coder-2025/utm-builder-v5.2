@@ -126,9 +126,10 @@ h1 {
 }
 
 .utm-url {
-    min-width: 400px;  /* Ensures minimum width for URL column */
-    white-space: normal;  /* Allows text to wrap */
-    word-break: break-all;  /* Breaks long URLs */
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .utm-actions {
