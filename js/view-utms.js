@@ -6,6 +6,20 @@ class UTMViewer {
         this.db = firebase.firestore();
         this.utmCollection = this.db.collection('utm_strings');
         this.filters = {};
+        this.filterOptions = {
+            market: new Set(),
+            brand: new Set(),
+            campaignName: new Set(),
+            channel: new Set(),
+            channelType: new Set(),
+            financialYear: new Set(),
+            quarter: new Set(),
+            month: new Set(),
+            utmSource: new Set(),
+            utmMedium: new Set(),
+            productCategory: new Set(),
+            mediaObjective: new Set()
+        };
         this.initializeEventListeners();
         this.loadFilterOptions();
         this.loadUTMs();
@@ -15,42 +29,30 @@ class UTMViewer {
         try {
             console.log('Loading filter options');
             const snapshot = await this.utmCollection.get();
-            const filters = {
-                market: new Set(),
-                brand: new Set(),
-                campaignName: new Set(),
-                channel: new Set(),
-                channelType: new Set(),
-                financialYear: new Set(),
-                quarter: new Set(),
-                month: new Set(),
-                utmSource: new Set(),
-                utmMedium: new Set(),
-                productCategory: new Set(),
-                mediaObjective: new Set()
-            };
-
             snapshot.forEach(doc => {
                 const data = doc.data();
                 console.log('Processing document for filters:', data);
-                Object.keys(filters).forEach(filterKey => {
+                Object.keys(this.filterOptions).forEach(filterKey => {
                     if (data[filterKey]) {
-                        filters[filterKey].add(data[filterKey]);
+                        this.filterOptions[filterKey].add(data[filterKey]);
                     }
                 });
             });
 
-            console.log('Populated filters:', filters);
-
-            // Populate dropdowns dynamically
-            Object.keys(filters).forEach(filterKey => {
-                const dropdownId = `filter${filterKey.charAt(0).toUpperCase() + filterKey.slice(1)}`;
-                this.populateDropdown(dropdownId, Array.from(filters[filterKey]));
-            });
+            console.log('Populated filters:', this.filterOptions);
+            this.populateFilterDropdowns();
         } catch (error) {
             console.error('Error loading filter options:', error);
             this.showNotification('Error loading filter options: ' + error.message);
         }
+    }
+
+    populateFilterDropdowns() {
+        Object.keys(this.filterOptions).forEach(filterKey => {
+            const dropdownId = `filter${filterKey.charAt(0).toUpperCase() + filterKey.slice(1)}`;
+            const options = Array.from(this.filterOptions[filterKey]).sort();
+            this.populateDropdown(dropdownId, options);
+        });
     }
 
     populateDropdown(elementId, options) {
@@ -64,7 +66,7 @@ class UTMViewer {
         dropdown.innerHTML = '';
         dropdown.appendChild(firstOption);
 
-        options.sort().forEach(option => {
+        options.forEach(option => {
             const element = document.createElement('option');
             element.value = option;
             element.textContent = option;
@@ -98,6 +100,7 @@ class UTMViewer {
                         delete this.filters[filterName];
                     }
                     console.log('Current filters:', this.filters);
+                    this.updateFilterOptions();
                     this.loadUTMs();
                 });
             }
@@ -110,6 +113,29 @@ class UTMViewer {
                 this.clearFilters();
             });
         }
+    }
+
+    updateFilterOptions() {
+        // Update filter options based on current filters
+        const updatedOptions = { ...this.filterOptions };
+        Object.keys(this.filters).forEach(filterKey => {
+            const filteredValues = new Set();
+            this.utmCollection.get().then(snapshot => {
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data[filterKey] === this.filters[filterKey]) {
+                        Object.keys(updatedOptions).forEach(optionKey => {
+                            if (data[optionKey]) {
+                                filteredValues.add(data[optionKey]);
+                            }
+                        });
+                    }
+                });
+                updatedOptions[filterKey] = filteredValues;
+                this.populateFilterDropdowns();
+            });
+        });
+        this.filterOptions = updatedOptions;
     }
 
     clearFilters() {
@@ -128,7 +154,8 @@ class UTMViewer {
             if (element) element.selectedIndex = 0;
         });
 
-        // Reload UTMs without filters
+        // Reload filter options and UTMs without filters
+        this.loadFilterOptions();
         this.loadUTMs();
     }
 
