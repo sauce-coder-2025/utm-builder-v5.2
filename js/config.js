@@ -81,6 +81,18 @@ const CONFIG = {
         }
     },
 
+      // Add to the existing abbreviations section
+            abbreviations: {
+    // ... existing abbreviations
+               specialFields: {
+              'UKS': 'UKS',
+              'UFC': 'UFC', 
+              'MOT': 'MOT',
+              'Promotion': 'PROMO',
+              'NPI': 'NPI'
+          }
+      },
+
     // Manual channel settings
     manualChannelTypes: ['Offline', 'Partnership'],
     manualBuyTypes: {
