@@ -1,12 +1,12 @@
 const firebaseConfig = {
-      apiKey: "AIzaSyAeA92bKST_oMfhKqqKuaUh7eN5Qdqg1BQ",
-      authDomain: "fisherpaykel-utm-builder-app.firebaseapp.com",
-      projectId: "fisherpaykel-utm-builder-app",
-      storageBucket: "fisherpaykel-utm-builder-app.firebasestorage.app",
-      messagingSenderId: "98977816783",
-      appId: "1:989778167843:web:96555b3ed1149a7a6dc996",
-      measurementId: "G-DZ6MCDJVDY"
-    };
+    apiKey: "AIzaSyAeA92bKST_oMfhKqqKuaUh7eN5Qdqg1BQ",
+    authDomain: "fisherpaykel-utm-builder-app.firebaseapp.com",
+    projectId: "fisherpaykel-utm-builder-app",
+    storageBucket: "fisherpaykel-utm-builder-app.firebasestorage.app",
+    messagingSenderId: "98977816783",
+    appId: "1:989778167843:web:96555b3ed1149a7a6dc996",
+    measurementId: "G-DZ6MCDJVDY"
+};
 
 firebase.initializeApp(firebaseConfig);
 
@@ -81,18 +81,6 @@ const CONFIG = {
         }
     },
 
-      // Add to the existing abbreviations section
-            abbreviations: {
-    // ... existing abbreviations
-               specialFields: {
-              'UKS': 'UKS',
-              'UFC': 'UFC', 
-              'MOT': 'MOT',
-              'Promotion': 'PROMO',
-              'NPI': 'NPI'
-          }
-      },
-
     // Manual channel settings
     manualChannelTypes: ['Offline', 'Partnership'],
     manualBuyTypes: {
@@ -100,7 +88,7 @@ const CONFIG = {
         'Partnership': ['Email', 'Website', 'Social', 'Paid Social', 'Offline']
     },
 
-    // Abbreviations for name generation
+    // Consolidated Abbreviations
     abbreviations: {
         // Market-specific brand abbreviations
         markets: {
@@ -138,6 +126,14 @@ const CONFIG = {
                 'Home Solutions': 'HSGBL',
                 'DCS': 'DCSGBL'
             }
+        },
+        // Special Fields Abbreviations
+        specialFields: {
+            'UKS': 'UKS',
+            'UFC': 'UFC', 
+            'MOT': 'MOT',
+            'Promotion': 'PROMO',
+            'NPI': 'NPI'
         },
         // Media objective abbreviations
         mediaObjective: {
@@ -208,3 +204,8 @@ const CONFIG = {
         }
     }
 };
+
+// Ensure it's globally available
+if (typeof window !== 'undefined') {
+    window.CONFIG = CONFIG;
+}
