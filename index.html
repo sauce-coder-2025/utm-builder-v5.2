@@ -7,77 +7,17 @@
     <title>Ultimate UTM Builder</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        .form-section {
-            background-color: #f8f9fa;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-        }
-
-        .campaign-timing-container {
-            display: flex;
-            gap: 20px;
-        }
-
-        .timing-item {
-            flex: 1;
-        }
-
-        .utm-log {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            max-height: 600px;
-            overflow-y: auto;
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            background-color: #198754;
-            color: white;
-            padding: 15px 25px;
-            border-radius: 4px;
-            transition: opacity 0.3s ease-in-out;
-        }
-
-        .notification.hiding {
-            opacity: 0;
-        }
-
-        .utm-url {
-            max-width: 200px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .utm-actions {
-            white-space: nowrap;
-        }
-
-        #generatedUtmSection {
-            display: none;
-            margin-top: 20px;
-            padding: 20px;
-            background-color: #e9ecef;
-            border-radius: 8px;
-        }
-    </style>
+    <link href="css/styles.css" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container text-center">
-            <div class="navbar-nav mx-auto">
-                <a class="nav-link active" href="index.html">Create UTM</a>
-                <a class="nav-link" href="view-utms.html" target="utmViewer">View UTMs</a>
-            </div>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container text-center">
+        <div class="navbar-nav mx-auto">
+            <a class="nav-link active" href="index.html">Create UTM</a>
+            <a class="nav-link" href="view-utms.html" target="utmViewer">View UTMs</a>
         </div>
-    </nav>
-
+    </div>
+</nav>
     <div class="container">
         <h1 class="text-center">Ultimate UTM Builder</h1>
         <div id="notification" class="notification" style="display: none;">
@@ -85,7 +25,6 @@
                 <span id="notification-message"></span>
             </div>
         </div>
-
         <div class="row">
             <div class="col-md-8">
                 <!-- Campaign Organization -->
@@ -117,7 +56,7 @@
                                 <option value="">Select...</option>
                                 <option value="Cooling">Cooling</option>
                                 <option value="Cooking">Cooking</option>
-                                <option value="Fabric Care">Fabric Care</option>
+                                <option value="Fabrice Care">Fabric Care</option>
                                 <option value="Dishwashing">Dishwashing</option>
                                 <option value="Outdoor">Outdoor</option>
                                 <option value="Ventilation">Ventilation</option>
@@ -129,15 +68,6 @@
                             <label for="subCategory" class="form-label">Sub Category</label>
                             <select class="form-select" id="subCategory">
                                 <option value="">Select...</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="specialField" class="form-label">Special Field</label>
-                            <select class="form-select" id="specialField">
-                                <option value="">Select...</option>
-                                <option value="UKS">UKS</option>
-                                <option value="UFC">UFC</option>
-                                <option value="MOT">MOT</option>
                             </select>
                         </div>
                     </div>
@@ -179,20 +109,10 @@
                 <div class="form-section">
                     <h3>Campaign Details</h3>
                     <div class="row g-3">
-                        <div class="col-12">
+                        <div class="col-12 mb-3">
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" id="manualChannelToggle">
                                 <label class="form-check-label" for="manualChannelToggle">Enable manual source input</label>
-                            </div>
-                        </div>
-                        <div class="col-12 mb-3">
-                            <div class="form-check me-3 d-inline-block">
-                                <input class="form-check-input" type="checkbox" id="promotionCheck">
-                                <label class="form-check-label" for="promotionCheck">Promotion</label>
-                            </div>
-                            <div class="form-check d-inline-block">
-                                <input class="form-check-input" type="checkbox" id="npiCheck">
-                                <label class="form-check-label" for="npiCheck">NPI</label>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -253,111 +173,59 @@
                     </div>
                 </div>
 
-                <!-- UTM Generator Section -->
-                <div class="form-section">
-                    <h3>UTM Generator</h3>
-                    <div class="row g-3">
-                        <div class="col-12">
-                            <label for="url" class="form-label">Landing Page URL</label>
-                            <input type="url" class="form-control" id="url" placeholder="https://example.com" required>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Campaign Details Section -->
-                <div class="form-section">
-                    <h3>Campaign Details</h3>
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="source" class="form-label">Source</label>
-                            <input type="text" class="form-control" id="source" placeholder="facebook">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="medium" class="form-label">Medium</label>
-                            <input type="text" class="form-control" id="medium" placeholder="social">
-                        </div>
-                        <div class="col-12">
-                            <label for="campaign" class="form-label">Campaign Name</label>
-                            <input type="text" class="form-control" id="campaign" placeholder="summer_sale">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="term" class="form-label">Terms (optional)</label>
-                            <input type="text" class="form-control" id="term" placeholder="blue+shoes">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="content" class="form-label">Content (optional)</label>
-                            <input type="text" class="form-control" id="content" placeholder="logolink">
-                        </div>
-                    </div>
-                </div>
-
                 <!-- UTM Parameters -->
                 <div class="form-section">
                     <h3>UTM Parameters</h3>
-                    <div class="col-12 mb-3">
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="manualUtmToggle">
-                            <label class="form-check-label" for="manualUtmToggle">Enable manual UTM input</label>
-                        </div>
-                    </div>
                     <div class="row g-3">
+                        <div class="col-12 mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="manualUtmToggle">
+                                <label class="form-check-label" for="manualUtmToggle">Enable manual UTM parameter input</label>
+                            </div>
+                        </div>
+                        
                         <div class="col-md-6">
                             <label for="utmSource" class="form-label">UTM Source</label>
-                            <input type="text" class="form-control" id="utmSource" readonly required>
+                            <input type="text" class="form-control" id="utmSource" readonly>
+                            <small class="text-muted">Auto-populated from Source</small>
                         </div>
                         <div class="col-md-6">
                             <label for="utmMedium" class="form-label">UTM Medium</label>
-                            <input type="text" class="form-control" id="utmMedium" readonly required>
+                            <input type="text" class="form-control" id="utmMedium" readonly>
+                            <small class="text-muted">Auto-populated from Medium</small>
                         </div>
                         <div class="col-md-6">
                             <label for="utmCampaign" class="form-label">UTM Campaign</label>
-                            <input type="text" class="form-control" id="utmCampaign" readonly required>
+                            <input type="text" class="form-control" id="utmCampaign" readonly>
+                            <small class="text-muted">Auto-populated from Campaign Name</small>
                         </div>
                         <div class="col-md-6">
                             <label for="utmContent" class="form-label">UTM Content</label>
                             <input type="text" class="form-control" id="utmContent" readonly>
+                            <small class="text-muted">Auto-populated from Ad Name</small>
                         </div>
                         <div class="col-md-6">
                             <label for="utmTerm" class="form-label">UTM Term</label>
                             <input type="text" class="form-control" id="utmTerm">
+                            <small class="text-muted">Manual input field</small>
                         </div>
+                        
                         <div class="col-12">
-                            <label for="generatedUrl" class="form-label">Generated URL</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" id="generatedUrl" readonly>
-                                <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('generatedUrl')">
-                                    <i class="bi bi-clipboard"></i>
+                            <button type="button" class="btn btn-primary" onclick="utmManager.generateUTM()">Generate UTM</button>
+                        </div>
+
+                        <div id="generatedUtmSection" style="display: none;" class="col-12 mt-4">
+                            <hr class="mb-4">
+                            <label class="form-label">Generated UTM URL:</label>
+                            <div class="generated-utm mb-3" id="generatedUtm"></div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button type="button" class="btn btn-success" onclick="utmManager.saveUTM()">Save UTM</button>
+                                <button type="button" class="btn btn-primary" id="endSaveButton" onclick="utmManager.completeSession()">
+                                    <span id="endSaveSpinner" class="spinner-border spinner-border-sm me-2" style="display: none;"></span>
+                                    End & Save Session
                                 </button>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="form-section">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <button type="button" class="btn btn-primary me-2" onclick="utmManager.generateUTM()">Generate UTM</button>
-                            <button type="button" class="btn btn-success me-2" onclick="utmManager.saveUTM()">Save UTM</button>
-                            <button type="button" class="btn btn-warning" onclick="utmManager.completeSession()">
-                                End Session
-                                <span id="endSaveSpinner" class="spinner-border spinner-border-sm" style="display: none;"></span>
-                            </button>
-                        </div>
-                        <div>
-                            <button type="button" class="btn btn-outline-secondary" onclick="Utils.clearForm()">Clear Form</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Generated UTM Section -->
-                <div id="generatedUtmSection">
-                    <h4>Generated UTM URL</h4>
-                    <div class="input-group">
-                        <input type="text" class="form-control" id="generatedUtm" readonly>
-                        <button class="btn btn-outline-secondary" type="button" onclick="Utils.copyToClipboard(document.getElementById('generatedUtm').value)">
-                            <i class="bi bi-clipboard"></i>
-                        </button>
                     </div>
                 </div>
             </div>
@@ -403,11 +271,6 @@
             console.log('FormManager loaded:', typeof FormManager !== 'undefined');
             console.log('Utils loaded:', typeof Utils !== 'undefined');
             console.log('UTMManager loaded:', typeof utmManager !== 'undefined');
-        });
-
-        // Initialize form manager when document is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            FormManager.initialize();
         });
     </script>
 </body>
