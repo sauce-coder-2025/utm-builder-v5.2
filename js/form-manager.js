@@ -6,34 +6,82 @@ class FormManager {
     }
 
     static addEventListeners() {
-        // Add event listeners for new fields
-        document.getElementById('market').addEventListener('change', () => {
+        // Ensure all elements exist before adding listeners
+        const elements = {
+            market: document.getElementById('market'),
+            brand: document.getElementById('brand'),
+            productCategory: document.getElementById('productCategory'),
+            subCategory: document.getElementById('subCategory'),
+            financialYear: document.getElementById('financialYear'),
+            quarter: document.getElementById('quarter'),
+            month: document.getElementById('month'),
+            mediaObjective: document.getElementById('mediaObjective'),
+            specialField: document.getElementById('specialField'),
+            promotionCheck: document.getElementById('promotionCheck'),
+            npiCheck: document.getElementById('npiCheck'),
+            channelDropdown: document.getElementById('channelDropdown'),
+            channelType: document.getElementById('channelType'),
+            manualChannelToggle: document.getElementById('manualChannelToggle'),
+            manualUtmToggle: document.getElementById('manualUtmToggle')
+        };
+
+        // Verify all elements exist
+        for (const [key, element] of Object.entries(elements)) {
+            if (!element) {
+                console.error(`Element ${key} not found`);
+                return;
+            }
+        }
+
+        // Add event listeners for campaign name generation
+        elements.market.addEventListener('change', () => {
             this.updateBrandOptions();
             this.generateCampaignName();
         });
-        document.getElementById('brand').addEventListener('change', () => this.generateCampaignName());
-        document.getElementById('productCategory').addEventListener('change', () => {
+
+        elements.brand.addEventListener('change', () => this.generateCampaignName());
+        
+        elements.productCategory.addEventListener('change', () => {
             this.updateSubCategories();
             this.generateCampaignName();
         });
-        document.getElementById('subCategory').addEventListener('change', () => this.generateCampaignName());
-        document.getElementById('financialYear').addEventListener('change', () => this.generateCampaignName());
-        document.getElementById('quarter').addEventListener('change', () => {
+        
+        elements.subCategory.addEventListener('change', () => {
+            this.generateCampaignName();
+            this.generateAdSetName();
+        });
+        
+        elements.financialYear.addEventListener('change', () => this.generateCampaignName());
+        
+        elements.quarter.addEventListener('change', () => {
             this.updateQuarterMonths();
             this.generateCampaignName();
         });
-        document.getElementById('month').addEventListener('change', () => this.generateCampaignName());
-        document.getElementById('mediaObjective').addEventListener('change', () => this.generateCampaignName());
         
-        // New fields
-        document.getElementById('specialField').addEventListener('change', () => this.generateCampaignName());
-        document.getElementById('promotionCheck').addEventListener('change', () => this.generateCampaignName());
-        document.getElementById('npiCheck').addEventListener('change', () => this.generateCampaignName());
+        elements.month.addEventListener('change', () => this.generateCampaignName());
+        elements.mediaObjective.addEventListener('change', () => this.generateCampaignName());
+        elements.specialField.addEventListener('change', () => this.generateCampaignName());
+        elements.promotionCheck.addEventListener('change', () => this.generateCampaignName());
+        elements.npiCheck.addEventListener('change', () => this.generateCampaignName());
 
-        // Existing event listeners
-        document.getElementById('channelDropdown').addEventListener('change', () => this.updateChannelDependencies());
-        document.getElementById('manualChannelToggle').addEventListener('change', () => this.toggleManualChannel());
-        document.getElementById('manualUtmToggle').addEventListener('change', () => this.toggleManualUtm());
+        // Channel dependency listeners
+        elements.channelDropdown.addEventListener('change', () => {
+            this.updateChannelDependencies();
+            this.updateUTMFields();
+        });
+
+        elements.channelType.addEventListener('change', () => {
+            this.updateBuyTypes();
+            this.updateUTMFields();
+            this.generateAdSetName();
+        });
+
+        // Toggle listeners
+        elements.manualChannelToggle.addEventListener('change', () => this.toggleManualChannel());
+        elements.manualUtmToggle.addEventListener('change', () => this.toggleManualUtm());
+
+        // Ad name listener
+        document.getElementById('adName').addEventListener('input', () => this.updateUTMFields());
     }
 
     static initializeDropdowns() {
@@ -161,8 +209,28 @@ class FormManager {
                 buyTypeSelect.appendChild(option);
             });
         }
+    }
 
-        this.updateUTMFields();
+    static updateBuyTypes() {
+        const channelType = document.getElementById('channelType').value;
+        const buyTypeSelect = document.getElementById('buyType');
+        const isManual = document.getElementById('manualChannelToggle').checked;
+
+        if (!buyTypeSelect) {
+            console.error('Buy type select element not found');
+            return;
+        }
+
+        buyTypeSelect.innerHTML = '<option value="">Select...</option>';
+
+        if (isManual && channelType && CONFIG.manualBuyTypes[channelType]) {
+            CONFIG.manualBuyTypes[channelType].forEach(type => {
+                const option = document.createElement('option');
+                option.value = type;
+                option.textContent = type;
+                buyTypeSelect.appendChild(option);
+            });
+        }
     }
 
     static generateCampaignName() {
@@ -206,65 +274,6 @@ class FormManager {
         this.updateUTMFields();
     }
 
-    static toggleManualChannel() {
-        console.log('Toggling manual channel input');
-        const isManual = document.getElementById('manualChannelToggle').checked;
-        const dropdownDiv = document.getElementById('channelDropdown');
-        const inputDiv = document.getElementById('channelInput');
-        const channelTypeSelect = document.getElementById('channelType');
-        const buyTypeSelect = document.getElementById('buyType');
-
-        dropdownDiv.style.display = isManual ? 'none' : 'block';
-        inputDiv.style.display = isManual ? 'block' : 'none';
-        
-        if (isManual) {
-            inputDiv.value = '';
-            dropdownDiv.value = '';
-            
-            // Add event listener for manual input changes
-            inputDiv.addEventListener('input', () => {
-                this.updateUTMFields();
-            });
-            
-            this.updateChannelDependencies();
-        } else {
-            inputDiv.value = '';
-            this.updateChannelDependencies();
-        }
-
-        // Add event listener for channel type changes
-        channelTypeSelect.addEventListener('change', () => {
-            const selectedType = channelTypeSelect.value;
-            buyTypeSelect.innerHTML = '<option value="">Select...</option>';
-            
-            if (isManual && selectedType && CONFIG.manualBuyTypes[selectedType]) {
-                CONFIG.manualBuyTypes[selectedType].forEach(type => {
-                    const option = document.createElement('option');
-                    option.value = type;
-                    option.textContent = type;
-                    buyTypeSelect.appendChild(option);
-                });
-            }
-            this.updateUTMFields();
-        });
-    }
-
-    static toggleManualUtm() {
-        console.log('Toggling manual UTM input');
-        const isManual = document.getElementById('manualUtmToggle').checked;
-        const utmFields = ['utmSource', 'utmMedium', 'utmCampaign', 'utmContent'];
-        
-        utmFields.forEach(fieldId => {
-            const field = document.getElementById(fieldId);
-            field.readOnly = !isManual;
-            if (isManual) {
-                field.value = '';
-            } else {
-                this.updateUTMFields();
-            }
-        });
-    }
-
     static generateAdSetName() {
         console.log('Generating ad set name');
         const productCategory = document.getElementById('productCategory').value;
@@ -282,6 +291,52 @@ class FormManager {
             
         const adSetName = adSetElements.join('_');
         document.getElementById('adSet').value = adSetName;
+    }
+
+    static toggleManualChannel() {
+        console.log('Toggling manual channel input');
+        const isManual = document.getElementById('manualChannelToggle').checked;
+        const dropdownDiv = document.getElementById('channelDropdown');
+        const inputDiv = document.getElementById('channelInput');
+        
+        if (!dropdownDiv || !inputDiv) {
+            console.error('Channel input elements not found');
+            return;
+        }
+
+        dropdownDiv.style.display = isManual ? 'none' : 'block';
+        inputDiv.style.display = isManual ? 'block' : 'none';
+        
+        if (isManual) {
+            inputDiv.value = '';
+            dropdownDiv.value = '';
+            
+            // Add event listener for manual input changes
+            inputDiv.addEventListener('input', () => {
+                this.updateUTMFields();
+            });
+        }
+        
+        this.updateChannelDependencies();
+        this.updateUTMFields();
+    }
+
+    static toggleManualUtm() {
+        console.log('Toggling manual UTM input');
+        const isManual = document.getElementById('manualUtmToggle').checked;
+        const utmFields = ['utmSource', 'utmMedium', 'utmCampaign', 'utmContent', 'utmTerm'];
+        
+        utmFields.forEach(fieldId => {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.readOnly = !isManual;
+                if (isManual) {
+                    field.value = '';
+                } else {
+                    this.updateUTMFields();
+                }
+            }
+        });
     }
 
     static updateUTMFields() {
