@@ -2,6 +2,38 @@ class FormManager {
     static initialize() {
         console.log('Initializing FormManager');
         this.initializeDropdowns();
+        this.addEventListeners();
+    }
+
+    static addEventListeners() {
+        // Add event listeners for new fields
+        document.getElementById('market').addEventListener('change', () => {
+            this.updateBrandOptions();
+            this.generateCampaignName();
+        });
+        document.getElementById('brand').addEventListener('change', () => this.generateCampaignName());
+        document.getElementById('productCategory').addEventListener('change', () => {
+            this.updateSubCategories();
+            this.generateCampaignName();
+        });
+        document.getElementById('subCategory').addEventListener('change', () => this.generateCampaignName());
+        document.getElementById('financialYear').addEventListener('change', () => this.generateCampaignName());
+        document.getElementById('quarter').addEventListener('change', () => {
+            this.updateQuarterMonths();
+            this.generateCampaignName();
+        });
+        document.getElementById('month').addEventListener('change', () => this.generateCampaignName());
+        document.getElementById('mediaObjective').addEventListener('change', () => this.generateCampaignName());
+        
+        // New fields
+        document.getElementById('specialField').addEventListener('change', () => this.generateCampaignName());
+        document.getElementById('promotionCheck').addEventListener('change', () => this.generateCampaignName());
+        document.getElementById('npiCheck').addEventListener('change', () => this.generateCampaignName());
+
+        // Existing event listeners
+        document.getElementById('channelDropdown').addEventListener('change', () => this.updateChannelDependencies());
+        document.getElementById('manualChannelToggle').addEventListener('change', () => this.toggleManualChannel());
+        document.getElementById('manualUtmToggle').addEventListener('change', () => this.toggleManualUtm());
     }
 
     static initializeDropdowns() {
@@ -141,57 +173,37 @@ class FormManager {
         const quarter = document.getElementById('quarter').value;
         const month = document.getElementById('month').value;
         const mediaObjective = document.getElementById('mediaObjective').value;
+        
+        // New fields
+        const specialField = document.getElementById('specialField').value;
+        const promotionCheck = document.getElementById('promotionCheck').checked;
+        const npiCheck = document.getElementById('npiCheck').checked;
 
         if (!market || !brand || !financialYear || !quarter) return;
 
         const brandAbbr = CONFIG.abbreviations.markets[market]?.[brand] || brand;
         const monthAbbr = month ? CONFIG.abbreviations.month[month] : '';
         const objectiveAbbr = mediaObjective ? CONFIG.abbreviations.mediaObjective[mediaObjective] : '';
+        
+        // New field abbreviations
+        const specialFieldAbbr = specialField ? CONFIG.abbreviations.specialFields[specialField] : '';
+        const promotionAbbr = promotionCheck ? CONFIG.abbreviations.specialFields['Promotion'] : '';
+        const npiAbbr = npiCheck ? CONFIG.abbreviations.specialFields['NPI'] : '';
 
-        const campaignElements = [brandAbbr, financialYear, quarter, monthAbbr, objectiveAbbr]
-            .filter(Boolean);
+        const campaignElements = [
+            brandAbbr, 
+            financialYear, 
+            quarter, 
+            monthAbbr, 
+            objectiveAbbr,
+            specialFieldAbbr,
+            promotionAbbr,
+            npiAbbr
+        ].filter(Boolean);
         
         const campaignName = campaignElements.join('_');
         document.getElementById('campaignName').value = campaignName;
         this.updateUTMFields();
-    }
-
-    static generateAdSetName() {
-        console.log('Generating ad set name');
-        const productCategory = document.getElementById('productCategory').value;
-        const subCategory = document.getElementById('subCategory').value;
-        const buyType = document.getElementById('buyType').value;
-
-        if (!productCategory) return;
-
-        const categoryAbbr = CONFIG.abbreviations.category[productCategory] || productCategory;
-        const subCategoryAbbr = subCategory ? CONFIG.abbreviations.subCategory[subCategory] : '';
-        const buyTypeAbbr = buyType ? CONFIG.abbreviations.buyType[buyType] : '';
-
-        const adSetElements = [categoryAbbr, subCategoryAbbr, buyTypeAbbr]
-            .filter(Boolean);
-            
-        const adSetName = adSetElements.join('_');
-        document.getElementById('adSet').value = adSetName;
-    }
-
-    static updateUTMFields() {
-        console.log('Updating UTM fields');
-        if (document.getElementById('manualUtmToggle').checked) return;
-
-        const isManualChannel = document.getElementById('manualChannelToggle').checked;
-        const channel = isManualChannel 
-            ? document.getElementById('channelInput').value 
-            : document.getElementById('channelDropdown').value;
-        const channelType = document.getElementById('channelType').value;
-        const campaignName = document.getElementById('campaignName').value;
-        const adName = document.getElementById('adName').value;
-
-        // Update UTM fields
-        document.getElementById('utmSource').value = Utils.formatUtmValue(channel);
-        document.getElementById('utmMedium').value = Utils.formatUtmValue(channelType);
-        document.getElementById('utmCampaign').value = Utils.formatUtmValue(campaignName);
-        document.getElementById('utmContent').value = Utils.formatUtmValue(adName);
     }
 
     static toggleManualChannel() {
@@ -253,6 +265,44 @@ class FormManager {
         });
     }
 
+    static generateAdSetName() {
+        console.log('Generating ad set name');
+        const productCategory = document.getElementById('productCategory').value;
+        const subCategory = document.getElementById('subCategory').value;
+        const buyType = document.getElementById('buyType').value;
+
+        if (!productCategory) return;
+
+        const categoryAbbr = CONFIG.abbreviations.category[productCategory] || productCategory;
+        const subCategoryAbbr = subCategory ? CONFIG.abbreviations.subCategory[subCategory] : '';
+        const buyTypeAbbr = buyType ? CONFIG.abbreviations.buyType[buyType] : '';
+
+        const adSetElements = [categoryAbbr, subCategoryAbbr, buyTypeAbbr]
+            .filter(Boolean);
+            
+        const adSetName = adSetElements.join('_');
+        document.getElementById('adSet').value = adSetName;
+    }
+
+    static updateUTMFields() {
+        console.log('Updating UTM fields');
+        if (document.getElementById('manualUtmToggle').checked) return;
+
+        const isManualChannel = document.getElementById('manualChannelToggle').checked;
+        const channel = isManualChannel 
+            ? document.getElementById('channelInput').value 
+            : document.getElementById('channelDropdown').value;
+        const channelType = document.getElementById('channelType').value;
+        const campaignName = document.getElementById('campaignName').value;
+        const adName = document.getElementById('adName').value;
+
+        // Update UTM fields
+        document.getElementById('utmSource').value = Utils.formatUtmValue(channel);
+        document.getElementById('utmMedium').value = Utils.formatUtmValue(channelType);
+        document.getElementById('utmCampaign').value = Utils.formatUtmValue(campaignName);
+        document.getElementById('utmContent').value = Utils.formatUtmValue(adName);
+    }
+
     static getFormData() {
         return {
             market: document.getElementById('market').value,
@@ -269,7 +319,10 @@ class FormManager {
             baseUrl: document.getElementById('baseUrl').value,
             campaignName: document.getElementById('campaignName').value,
             adSet: document.getElementById('adSet').value,
-            adName: document.getElementById('adName').value
+            adName: document.getElementById('adName').value,
+            specialField: document.getElementById('specialField').value,
+            promotionCheck: document.getElementById('promotionCheck').checked,
+            npiCheck: document.getElementById('npiCheck').checked
         };
     }
 }
