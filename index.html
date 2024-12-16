@@ -253,6 +253,44 @@
                     </div>
                 </div>
 
+                <!-- UTM Generator Section -->
+                <div class="form-section">
+                    <h3>UTM Generator</h3>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="url" class="form-label">Landing Page URL</label>
+                            <input type="url" class="form-control" id="url" placeholder="https://example.com" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Campaign Details Section -->
+                <div class="form-section">
+                    <h3>Campaign Details</h3>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="source" class="form-label">Source</label>
+                            <input type="text" class="form-control" id="source" placeholder="facebook">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="medium" class="form-label">Medium</label>
+                            <input type="text" class="form-control" id="medium" placeholder="social">
+                        </div>
+                        <div class="col-12">
+                            <label for="campaign" class="form-label">Campaign Name</label>
+                            <input type="text" class="form-control" id="campaign" placeholder="summer_sale">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="term" class="form-label">Terms (optional)</label>
+                            <input type="text" class="form-control" id="term" placeholder="blue+shoes">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="content" class="form-label">Content (optional)</label>
+                            <input type="text" class="form-control" id="content" placeholder="logolink">
+                        </div>
+                    </div>
+                </div>
+
                 <!-- UTM Parameters -->
                 <div class="form-section">
                     <h3>UTM Parameters</h3>
@@ -282,6 +320,15 @@
                         <div class="col-md-6">
                             <label for="utmTerm" class="form-label">UTM Term</label>
                             <input type="text" class="form-control" id="utmTerm">
+                        </div>
+                        <div class="col-12">
+                            <label for="generatedUrl" class="form-label">Generated URL</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="generatedUrl" readonly>
+                                <button class="btn btn-outline-secondary" type="button" onclick="copyToClipboard('generatedUrl')">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
