@@ -5,168 +5,134 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Ultimate UTM Builder - UTM Viewer</title>
+    
+    <!-- CSS Dependencies -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
-    <style>
-        /* Custom styles for notification */
-        .notification {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
-            display: none;
-        }
-        .notification-content {
-            background-color: #333;
-            color: white;
-            padding: 15px;
-            border-radius: 5px;
-            text-align: center;
-        }
-        .utm-url {
-            max-width: 300px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .utm-actions {
-            min-width: 100px;
-        }
-
-        /* Responsive padding styles */
-        @media (max-width: 767.98px) {
-            .container-fluid {
-                padding-left: 20px;
-                padding-right: 20px;
-            }
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
 </head>
 <body>
+    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container text-center">
             <div class="navbar-nav mx-auto">
                 <a class="nav-link" href="index.html" target="_self">Create UTM</a>
-                <a class="nav-link active" href="view-utms.html" target="utmViewer">View UTMs</a>
+                <a class="nav-link active" href="view-utms.html">View UTMs</a>
             </div>
         </div>
     </nav>
 
     <div class="container-fluid">
-        <h1 class="text-center my-4">UTM Tracker</h1>
+        <h1 class="text-center my-4">UTM Viewer</h1>
 
-        <!-- Notification area -->
-        <div id="notification" class="notification">
-            <div class="notification-content">
-                <span id="notification-message"></span>
+        <!-- View Controls -->
+            <div class="view-controls">
+                <div class="row g-3 align-items-center">
+                    <div class="col-12 col-md-8">
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-search"></i></span>
+                            <input type="text" class="form-control" id="globalSearch" placeholder="Search across all fields...">
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-4 text-end">
+                        <div class="btn-group">
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#columnModal">
+                                <i class="bi bi-table"></i> Columns
+                            </button>
+                            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#filterPresetsModal">
+                                <i class="bi bi-bookmark"></i> Filter Presets
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="row">
+        <!-- Active Filters Display -->
+        <div id="activeFilters">
+            <div class="d-flex flex-wrap gap-2">
+                <!-- Active filters will be added here dynamically -->
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content-wrapper">
             <!-- Filter Panel -->
-            <div class="col-md-4">
-                <div class="card mb-4">
-                    <div class="card-header">
+            <div id="filterPanel">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Filter UTMs</h5>
+                        <button class="btn btn-sm btn-outline-secondary" id="toggleFilters">
+                            <i class="bi bi-chevron-left"></i>
+                        </button>
                     </div>
                     <div class="card-body">
                         <form id="filterForm">
-                            <div class="form-section">
-                                <h3>Campaign Details</h3>
-                                <div class="row g-3">
-                                    <div class="col-md-6">
-                                        <label for="filterMarket" class="form-label">Market</label>
-                                        <select class="form-select" id="filterMarket">
-                                            <option value="">All Markets</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="filterBrand" class="form-label">Brand</label>
-                                        <select class="form-select" id="filterBrand">
-                                            <option value="">All Brands</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="row g-3 mt-2">
-                                    <div class="col-md-6">
-                                        <label for="filterCampaignName" class="form-label">Campaign Name</label>
-                                        <select class="form-select" id="filterCampaignName">
-                                            <option value="">All Campaigns</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="filterFinancialYear" class="form-label">Financial Year</label>
-                                        <select class="form-select" id="filterFinancialYear">
-                                            <option value="">All Years</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="row g-3 mt-2">
-                                    <div class="col-md-6">
-                                        <label for="filterChannel" class="form-label">Channel</label>
-                                        <select class="form-select" id="filterChannel">
-                                            <option value="">All Channels</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="filterChannelType" class="form-label">Channel Type</label>
-                                        <select class="form-select" id="filterChannelType">
-                                            <option value="">All Channel Types</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="row g-3 mt-2">
-                                    <div class="col-md-6">
-                                        <label for="filterQuarter" class="form-label">Quarter</label>
-                                        <select class="form-select" id="filterQuarter">
-                                            <option value="">All Quarters</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="filterMonth" class="form-label">Month</label>
-                                        <select class="form-select" id="filterMonth">
-                                            <option value="">All Months</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="row g-3 mt-2">
-                                    <div class="col-md-6">
-                                        <label for="filterUtmSource" class="form-label">UTM Source</label>
-                                        <select class="form-select" id="filterUtmSource">
-                                            <option value="">All Sources</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="filterUtmMedium" class="form-label">UTM Medium</label>
-                                        <select class="form-select" id="filterUtmMedium">
-                                            <option value="">All Mediums</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="row g-3 mt-2">
-                                    <div class="col-md-6">
-                                        <label for="filterProductCategory" class="form-label">Product Category</label>
-                                        <select class="form-select" id="filterProductCategory">
-                                            <option value="">All Categories</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="filterMediaObjective" class="form-label">Media Objective</label>
-                                        <select class="form-select" id="filterMediaObjective">
-                                            <option value="">All Objectives</option>
-                                        </select>
-                                    </div>
-                                </div>
+                            <div class="mb-3">
+                                <label for="filterMarket" class="form-label">Market</label>
+                                <select class="form-select select2" id="filterMarket" multiple>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="filterBrand" class="form-label">Brand</label>
+                                <select class="form-select select2" id="filterBrand" multiple>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="filterCampaignName" class="form-label">Campaign Name</label>
+                                <select class="form-select select2" id="filterCampaignName" multiple>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="filterChannel" class="form-label">Channel</label>
+                                <select class="form-select select2" id="filterChannel" multiple>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="filterChannelType" class="form-label">Channel Type</label>
+                                <select class="form-select select2" id="filterChannelType" multiple>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="filterFinancialYear" class="form-label">Financial Year</label>
+                                <select class="form-select select2" id="filterFinancialYear" multiple>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="filterQuarter" class="form-label">Quarter</label>
+                                <select class="form-select select2" id="filterQuarter" multiple>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="filterMonth" class="form-label">Month</label>
+                                <select class="form-select select2" id="filterMonth" multiple>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="filterUtmSource" class="form-label">UTM Source</label>
+                                <select class="form-select select2" id="filterUtmSource" multiple>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="filterUtmMedium" class="form-label">UTM Medium</label>
+                                <select class="form-select select2" id="filterUtmMedium" multiple>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="filterProductCategory" class="form-label">Product Category</label>
+                                <select class="form-select select2" id="filterProductCategory" multiple>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="filterMediaObjective" class="form-label">Media Objective</label>
+                                <select class="form-select select2" id="filterMediaObjective" multiple>
+                                </select>
                             </div>
 
-                            <div class="mt-3 d-flex justify-content-between">
-                                <button type="button" class="btn btn-secondary" id="clearFilters">Clear Filters</button>
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-secondary" id="clearFilters">Clear All</button>
+                                <button type="button" class="btn btn-primary" id="savePreset">Save As Preset</button>
                             </div>
                         </form>
                     </div>
@@ -174,22 +140,38 @@
             </div>
 
             <!-- UTM Display Panel -->
-            <div class="col-md-8">
+            <div id="utmPanel">
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="mb-0">UTM Log</h5>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">UTM Log</h5>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-outline-secondary" id="exportCsv">
+                                    <i class="bi bi-download"></i> Export
+                                </button>
+                            </div>
+                        </div>
                     </div>
-                    <div class="card-body">
+                    <div class="table-container">
                         <div class="table-responsive">
-                            <table class="table table-hover table-striped">
+                            <table class="table table-hover" id="utmTable">
                                 <thead>
                                     <tr>
-                                        <th>Actions</th>
-                                        <th>Campaign</th>
-                                        <th>Source</th>
-                                        <th>Medium</th>
-                                        <th>Content</th>
-                                        <th>UTM URL</th>
+                                        <th class="sticky-header">Actions</th>
+                                        <th class="sticky-header">Market</th>
+                                        <th class="sticky-header">Brand</th>
+                                        <th class="sticky-header">Campaign</th>
+                                        <th class="sticky-header">Channel</th>
+                                        <th class="sticky-header">Channel Type</th>
+                                        <th class="sticky-header">Financial Year</th>
+                                        <th class="sticky-header">Quarter</th>
+                                        <th class="sticky-header">Month</th>
+                                        <th class="sticky-header">Product Category</th>
+                                        <th class="sticky-header">Media Objective</th>
+                                        <th class="sticky-header">Source</th>
+                                        <th class="sticky-header">Medium</th>
+                                        <th class="sticky-header">Content</th>
+                                        <th class="sticky-header">UTM URL</th>
                                     </tr>
                                 </thead>
                                 <tbody id="utmLog">
@@ -203,9 +185,51 @@
         </div>
     </div>
 
+    <!-- Column Visibility Modal -->
+    <div class="modal fade" id="columnModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Configure Columns</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="columnToggles">
+                        <!-- Column toggles will be added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Presets Modal -->
+    <div class="modal fade" id="filterPresetsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Filter Presets</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="filterPresets">
+                        <!-- Saved presets will be listed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    
+    <!-- Firebase Dependencies -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <!-- Application Scripts -->
     <script src="js/config.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/view-utms.js"></script>
